@@ -1,0 +1,16 @@
+bin/
+obj/
+*.user
+
+node_modules/
+dist/
+.vite/
+
+.env
+appsettings.Development.json
+appsettings.Local.json
+
+.vs/
+Claude Ref/
+.claude
+.claude/settings.local.json

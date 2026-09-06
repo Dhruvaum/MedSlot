@@ -1,0 +1,6 @@
+@MedSlot.Api_HostAddress = http://localhost:5191
+
+GET {{MedSlot.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
