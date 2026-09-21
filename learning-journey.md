@@ -60,3 +60,13 @@ So, it's always like:
 10. OnConfiguring in `MedSlotDbContext` is a fallback, not the primary config path. DI (Program.cs + appsettings) is the real source; guard it with IsConfigured so it never overrides DI.
 
 11. Never return EF Core entities directly from an API endpoint — map to a DTO first. Entities carry navigation properties that serialize as noisy/misleading data (like "users": [] meaning "not loaded," not "empty") and can even crash with circular-reference errors. DTOs also survive re-scaffolding, since entity classes get overwritten every time we regenerate them.
+
+12. Doing schema compare is absolutely possible using EF Core, we run this command to scaffold the DB project using the connection string which ultimately gives us the dbcontext file and entities.
+
+```
+dotnet ef dbcontext scaffold "Server=LAPTOP-4ORBUCUD\SQLEXPRESS;Database=MedSlot;Trusted_Connection=True;TrustServerCertificate=True;" Microsoft.EntityFrameworkCore.SqlServer -o Models -c MedSlotDbContext --context-dir Data --force
+```
+
+Here, `-o` = --output-dir — where the generated entity classes go (Models, in my case).
+`-c` = --context — the name to give the generated DbContext class (MedSlotDbContext).
+`--context-dir Data` - directory name in which our dbcontext goes.
