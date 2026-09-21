@@ -1,0 +1,20 @@
+{
+  "Page Component": {
+    "prefix": "page",
+    "body": [
+      "<Page title=\"${1:Title}\">",
+      "\t$0",
+      "</Page>"
+    ],
+    "description": "MedSlot Page wrapper with title"
+  },
+  "Container Component": {
+    "prefix": "container",
+    "body": [
+      "<Container>",
+      "\t$0",
+      "</Container>"
+    ],
+    "description": "MedSlot Container wrapper"
+  }
+}
