@@ -1,5 +1,7 @@
 using MedSlot.Api.Data;
 using Microsoft.EntityFrameworkCore;
+using MedSlot.Api.Auth;
+using MedSlot.Api.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +13,22 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<MedSlotDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("MedSlotDb")));
 
+// Other Services
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+builder.Services.AddAuthServices();
+
+// CORS Configuration
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("FrontendPolicy", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -19,8 +37,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
+
+app.UseCors("FrontendPolicy");
 
 app.UseAuthorization();
 
