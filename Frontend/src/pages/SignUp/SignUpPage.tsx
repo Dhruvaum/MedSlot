@@ -14,7 +14,7 @@ const SignUpPage = () => {
       {
         selectedUserType === null
         ? <TypeSelectionStep setType={setSelectedUserType}/>
-        : <Form onBack={() => setSelectedUserType(null)}/>
+        : <Form userType={selectedUserType} onBack={() => setSelectedUserType(null)}/>
       }
     </Page>
   )

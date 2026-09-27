@@ -8,8 +8,8 @@ const fields: { name: keyof SignUpCredentials; label: string; type: string }[] =
   { name: 'confirmPassword', label: 'Confirm Password', type: 'password' },
 ]
 
-const Form = ({ onBack }: { onBack: () => void }) => {
-  const { credentials, errors, handleChange, handleSubmit } = useSignUpForm()
+const Form = ({ userType, onBack }: { userType: 'Patient' | 'Doctor', onBack: () => void }) => {
+  const { credentials, errors, handleChange, handleSubmit } = useSignUpForm(userType)
 
   return (
     <div className="flex min-h-[80vh] flex-col items-center justify-center gap-8 px-4">
