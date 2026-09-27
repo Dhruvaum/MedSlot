@@ -1,11 +1,16 @@
 import { useState, type FormEvent, type ChangeEvent } from 'react'
 import * as yup from 'yup'
 import { credentialsSchema } from './schema'
-import type { SignUpCredentials } from '../../../../features/auth/types'
+import type { SignUpCredentials, RegisterRequest,  } from '../../../../features/auth/types'
+import { registerAccount } from '../../../../services/Auth'
+import { useNavigate } from 'react-router-dom'
 
 type FormErrors = Partial<Record<keyof SignUpCredentials, string>>
 
-export const useSignUpForm = () => {
+export const useSignUpForm = (userType: 'Patient' | 'Doctor') => {
+
+  const navigate = useNavigate();
+
   const [credentials, setCredentials] = useState<SignUpCredentials>({
     userName: '',
     email: '',
@@ -36,8 +41,23 @@ export const useSignUpForm = () => {
       await credentialsSchema.validate(credentials, { abortEarly: false })
       setErrors({})
 
-      // TODO: wire to real registerAccount API once backend endpoint exists
-      console.log('Valid credentials, ready to submit:', credentials)
+      // Prepare request data
+      const request: RegisterRequest = {
+        userName: credentials.userName,
+        email: credentials.email,
+        password: credentials.password,
+        userType
+      }
+
+      // Hit register api
+      const response = await registerAccount(request);
+      if(response){
+        localStorage.setItem('authToken', response.authToken);
+        localStorage.setItem('role', response.role);
+
+        navigate('/completeProfile')
+      }
+
     } catch (err) {
       if (err instanceof yup.ValidationError) {
         const newErrors: FormErrors = {}
