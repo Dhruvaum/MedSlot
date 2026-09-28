@@ -25,7 +25,7 @@ export const usePatientForm = () => {
     const [errors, setErrors] = useState<FormErrors>({});
 
     const handleChange = (field: keyof PatientProfileData) => async (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const updatedProfile = {...profile, field:e.target.value};
+        const updatedProfile = {...profile, [field]:e.target.value};
         setProfile(updatedProfile);
 
         try{
