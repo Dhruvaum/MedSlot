@@ -7,7 +7,7 @@ namespace MedSlot.Api.Auth
     [Route("api/auth")]
     public class AuthController : ControllerBase
     {
-        public IAuthService _authService;
+        private IAuthService _authService;
 
         public AuthController(IAuthService authService)
         {
