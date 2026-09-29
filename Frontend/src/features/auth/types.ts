@@ -17,3 +17,13 @@ export interface RegisterResponse {
   role: string
   isRegistrationCompleted: boolean
 }
+
+export interface LoginRequest {
+  userName: string
+  password: string
+}
+
+export interface LoginResponse {
+  authToken: string
+  isRegistrationCompleted: boolean
+}

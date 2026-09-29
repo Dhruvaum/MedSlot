@@ -2,8 +2,9 @@ import { useState, type FormEvent, type ChangeEvent } from 'react'
 import * as yup from 'yup'
 import { credentialsSchema } from './schema'
 import type { SignUpCredentials, RegisterRequest,  } from '../../../../features/auth/types'
-import { registerAccount } from '../../../../services/Auth'
+import { registerAccount } from '../../../../features/auth/AuthService'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
 
 type FormErrors = Partial<Record<keyof SignUpCredentials, string>>
 
@@ -46,12 +47,14 @@ export const useSignUpForm = (userType: 'Patient' | 'Doctor') => {
         userName: credentials.userName,
         email: credentials.email,
         password: credentials.password,
-        userType
+        userType: userType
       }
 
       // Hit register api
       const response = await registerAccount(request);
       if(response){
+        toast.success('Registered Successfully !');
+
         localStorage.setItem('authToken', response.authToken);
         localStorage.setItem('role', response.role);
 
@@ -66,7 +69,9 @@ export const useSignUpForm = (userType: 'Patient' | 'Doctor') => {
             newErrors[validationError.path as keyof SignUpCredentials] = validationError.message
           }
         })
-        setErrors(newErrors)
+        setErrors(newErrors);
+
+        toast.error(`Error ${err}`);
       }
     }
   }
