@@ -1,4 +1,6 @@
-﻿using MedSlot.Api.Auth.Dtos;
+﻿using System.Security.Authentication;
+using System.Security.Claims;
+using MedSlot.Api.Auth.Dtos;
 using MedSlot.Api.Models;
 using Microsoft.AspNetCore.Identity;
 
@@ -52,6 +54,44 @@ namespace MedSlot.Api.Auth
                 AuthToken = token,
                 Role = request.UserType,
                 IsRegistrationCompleted = false,
+            };
+        }
+
+        public async Task<LoginResponse> LoginAsync(LoginRequest request)
+        {
+            // Get User
+            LoggingUser loggingUser = await _authRepository.GetLoggingUser(request);
+            User? user = loggingUser.user;
+            string? userType = loggingUser.userType;
+
+            if (user is null)
+            {
+                throw new AuthenticationException("Invalid UserName or Password");
+            }
+
+            // Validate Password
+            var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
+            bool isPasswordValid = result == PasswordVerificationResult.Success;
+            
+            if (!isPasswordValid)
+            {
+                throw new AuthenticationException("Invalid UserName or Password");
+            }
+
+            Claim? idClaim = null;
+
+            // add new claim as per user type
+            if (loggingUser.patientId != null) idClaim = new Claim("patientId", loggingUser.patientId.ToString());
+            if (loggingUser.doctorId != null) idClaim = new Claim("doctorId", loggingUser.doctorId.ToString());
+            
+            var additionalClaims = idClaim is not null ? new[] { idClaim } : Array.Empty<Claim>();
+
+            var token = _tokenService.GenerateToken(user.Id, userType, additionalClaims);
+
+            return new LoginResponse
+            {
+                AuthToken = token,
+                IsRegistrationCompleted = loggingUser.isRegistrationCompleted
             };
         }
     }

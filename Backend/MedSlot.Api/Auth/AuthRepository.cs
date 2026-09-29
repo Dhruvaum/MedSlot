@@ -1,5 +1,8 @@
-﻿using MedSlot.Api.Data;
+﻿using System.Security.Authentication;
+using MedSlot.Api.Auth.Dtos;
+using MedSlot.Api.Data;
 using MedSlot.Api.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace MedSlot.Api.Auth
@@ -38,5 +41,42 @@ namespace MedSlot.Api.Auth
             await _context.SaveChangesAsync();
         }
 
+        //Login
+
+        public async Task<LoggingUser> GetLoggingUser(LoginRequest request)
+        {
+            User? user = await _context.Users
+                .Include(u => u.UserType)
+                .FirstOrDefaultAsync(u => u.UserName == request.UserName);
+            if (user == null) return new LoggingUser();
+
+            var userType = user.UserType.TypeName;
+            var isRegistrationCompleted = user.IsRegistrationCompleted;
+
+            Guid? patientId = null;
+            Guid? doctorId = null;
+
+            if (userType == "Patient")
+            {
+                Patient? patient = await _context.Patients.FirstOrDefaultAsync(p => p.UserId == user.Id);
+                if (patient is not null) patientId = patient.Id;
+            }
+            else if (userType == "Doctor")
+            {
+                Doctor? doctor = await _context.Doctors.FirstOrDefaultAsync(d => d.UserId == user.Id);
+                if (doctor is not null) doctorId = doctor.Id;
+            }
+
+            var loggingUser = new LoggingUser
+            {
+                user = user,
+                userType = userType!,
+                patientId = patientId,
+                doctorId = doctorId,
+                isRegistrationCompleted = isRegistrationCompleted
+            };
+
+            return loggingUser;
+        }
     }
 }
