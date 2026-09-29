@@ -1,4 +1,5 @@
-﻿using MedSlot.Api.Models;
+﻿using MedSlot.Api.Auth.Dtos;
+using MedSlot.Api.Models;
 
 namespace MedSlot.Api.Auth
 {
@@ -8,5 +9,9 @@ namespace MedSlot.Api.Auth
         Task<Guid> GetUserTypeIdByNameAsync(string typeName);
         Task AddUserAsync(User user);
         Task SaveChangesAsync();
+
+        //Login
+
+        Task<LoggingUser> GetLoggingUser(LoginRequest user);
     }
 }

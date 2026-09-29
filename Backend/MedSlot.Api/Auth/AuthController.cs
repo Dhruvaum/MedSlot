@@ -20,5 +20,12 @@ namespace MedSlot.Api.Auth
             var response = await _authService.RegisterAsync(request);
             return Ok(response);
         }
+
+        [HttpPost("login")]
+        public async Task<ActionResult<LoginResponse>> Login(LoginRequest request)
+        {
+            var response = await _authService.LoginAsync(request);
+            return Ok(response);
+        }
     }
 }
