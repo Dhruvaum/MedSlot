@@ -1,8 +1,11 @@
-import React from 'react'
+import Page from '../../components/Page'
+import Form from './components/Form/Form'
 
 const SignInPage = () => {
   return (
-    <div>SignInPage</div>
+    <Page title="Sign In - MedSlot">
+      <Form />
+    </Page>
   )
 }
 

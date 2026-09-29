@@ -1,7 +1,10 @@
 import { useState, type ChangeEvent, type FormEvent } from "react"
 import { patientFormSchema } from "./schema";
 import * as yup from 'yup'
-import { completePatientProfile } from "../../../../services/CompleteProfile";
+import { completePatientProfile } from "../../../../features/completeProfile/CompleteProfileService";
+import type { CompletePatientProfileResponse } from "../../../../features/completeProfile/types";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 export interface PatientProfileData{
     fullName: string,
@@ -14,6 +17,9 @@ export interface PatientProfileData{
 type FormErrors = Partial<Record<keyof PatientProfileData, string>>;
 
 export const usePatientForm = () => {
+
+    const navigate = useNavigate();
+
     const [profile, setProfile] = useState<PatientProfileData>({
         fullName: '',
         dob: '',
@@ -47,7 +53,17 @@ export const usePatientForm = () => {
             setErrors({});
 
             // Prepare profile payload
-            await completePatientProfile(profile);
+            const response: CompletePatientProfileResponse = await completePatientProfile(profile);
+
+            if(response && response.authToken){
+                toast.success('Profile completed successfully!');
+
+                localStorage.removeItem("authToken");
+                localStorage.setItem("authToken", response.authToken);
+
+                // Navigate to Patient Dashboard
+                navigate('/patient');
+            }
         }
         catch(err){
             if(err instanceof yup.ValidationError){
@@ -58,6 +74,7 @@ export const usePatientForm = () => {
                     }
                 })
                 setErrors(newErrors);
+                toast.error(`Error ${err}`);
             }
         }
     }
