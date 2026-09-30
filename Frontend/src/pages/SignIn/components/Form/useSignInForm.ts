@@ -5,6 +5,7 @@ import { login } from '../../../../features/auth/AuthService'
 import type { LoginResponse } from '../../../../features/auth/types'
 import { toast } from 'sonner'
 import { useNavigate } from 'react-router-dom'
+import { decodeToken, type TokenPayload } from '../../../../utils/token'
 
 export interface SignInCredentials {
   userName: string
@@ -53,7 +54,18 @@ export const useSignInForm = () => {
         localStorage.setItem("authToken", response.authToken);
         localStorage.setItem('isRegistrationCompleted', `${response.isRegistrationCompleted}`)
 
-        navigate('/patient')
+        // Catch and redirect if registration is not completed
+        if(!response.isRegistrationCompleted){
+          navigate('/completeProfile');
+          return;
+        }
+
+        // Niavgate on the basis of decoded token's role
+        const {role} = decodeToken(response.authToken);
+        if(role){
+          if(role === 'Patient') navigate('/patient');
+          else if(role === 'Doctor') navigate('/doctor');
+        }
       }
     } catch (err) {
       if (err instanceof yup.ValidationError) {
