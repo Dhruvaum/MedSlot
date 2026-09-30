@@ -19,7 +19,7 @@ namespace MedSlot.Api.Auth
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
-                new Claim(ClaimTypes.Role, role)
+                new Claim("role", role)
             };
             claims.AddRange(additionalClaims);
 
