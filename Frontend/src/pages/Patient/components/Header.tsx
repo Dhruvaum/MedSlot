@@ -1,6 +1,9 @@
 import { Bell, UserCircle } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 
 const Header = () => {
+  const navigate = useNavigate()
+
   return (
     <header className='flex items-center justify-end gap-5 border-b border-slate-100 bg-white px-6 py-4'>
         <button type='button' className='text-xl text-slate-500 transition hover:text-brand hover:cursor-pointer' aria-label='Notifications'>
@@ -8,7 +11,7 @@ const Header = () => {
         </button>
         
         <button type='button' className='text-xl text-slate-500 transition hover:text-brand hover:cursor-pointer' aria-label='Notifications'>
-            <UserCircle size={20}/>
+            <UserCircle size={20} onClick={() => navigate('/patient/profile')}/>
         </button>
         
     </header>
