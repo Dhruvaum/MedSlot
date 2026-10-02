@@ -7,5 +7,6 @@ namespace MedSlot.Api.Patients
         Task AddPatientAsync(Patient patient);
         Task SaveChangesAsync();
         Task MarkUserRegistrationCompleteAsync(Guid userId);
+        Task<Patient?> GetPatientById(Guid patientId);
     }
 }

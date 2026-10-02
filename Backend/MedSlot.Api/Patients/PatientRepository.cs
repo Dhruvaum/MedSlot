@@ -34,5 +34,11 @@ namespace MedSlot.Api.Patients
             user.IsRegistrationCompleted = true;
         }
 
+        public async Task<Patient?> GetPatientById(Guid patientId)
+        {
+            Patient patient = await _context.Patients.FindAsync(patientId);
+            return patient;
+        }
+
     }
 }

@@ -22,5 +22,12 @@ namespace MedSlot.Api.Patients
             var response = await _patientService.CompleteProfileAsync(request);
             return Ok(response);
         }
+
+        [HttpGet("viewProfileInfo")]
+        public async Task<ActionResult<ViewProfileInfoResponse>> ViewProfileInfo()
+        {
+            var response = await _patientService.ViewProfileInfo();
+            return Ok(response);
+        }
     }
 }

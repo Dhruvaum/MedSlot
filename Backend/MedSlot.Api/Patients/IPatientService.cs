@@ -6,5 +6,6 @@ namespace MedSlot.Api.Patients
     public interface IPatientService
     {
         Task<CompleteProfileResponse> CompleteProfileAsync(CompleteProfileRequest request);
+        Task<ViewProfileInfoResponse> ViewProfileInfo();
     }
 }
