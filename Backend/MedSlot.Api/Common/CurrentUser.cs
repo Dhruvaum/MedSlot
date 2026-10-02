@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace MedSlot.Api.Common
 {
@@ -13,8 +14,11 @@ namespace MedSlot.Api.Common
         public bool IsAuthenticated => _user?.Identity?.IsAuthenticated ?? false;
 
         public Guid? UserId =>
-            Guid.TryParse(_user?.FindFirstValue(ClaimTypes.NameIdentifier), out var id) ? id : null;
+            Guid.TryParse(_user?.FindFirstValue(JwtRegisteredClaimNames.Sub), out var id) ? id : null;
 
-        public string? Role => _user.FindFirstValue(ClaimTypes.Role);
+
+        public string? Role => _user?.FindFirstValue("role");
+
+        public Guid? PatientId => Guid.TryParse(_user?.FindFirstValue("patientId"), out var patientId) ? patientId : null;
     }
 }

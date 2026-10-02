@@ -32,6 +32,7 @@ namespace MedSlot.Api.Auth
                     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     .AddJwtBearer(options =>
                     {
+                        options.MapInboundClaims = false;
                         options.TokenValidationParameters = new TokenValidationParameters
                         {
                             ValidateIssuer = true,
@@ -42,6 +43,7 @@ namespace MedSlot.Api.Auth
                             ValidAudience = configuration["Jwt:Audience"],
                             IssuerSigningKey = new SymmetricSecurityKey(
                                 Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!)),
+                            RoleClaimType = "role"
                         };
                     });
 

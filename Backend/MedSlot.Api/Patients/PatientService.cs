@@ -55,5 +55,32 @@ namespace MedSlot.Api.Patients
                 AuthToken = token
             };
         }
+
+        public async Task<ViewProfileInfoResponse> ViewProfileInfo()
+        {
+            Guid? PatientId = _currentUser.PatientId;
+
+            if (PatientId is null)
+            {
+                throw new UnauthorizedAccessException();
+            }
+
+            Patient? patient = await _patientRepository.GetPatientById(PatientId.Value);
+            if(patient is null)
+            {
+                throw new UnauthorizedAccessException();
+            }
+
+            var info = new ViewProfileInfoResponse
+            {
+                FullName = patient.FullName,
+                Dob = patient.Dob,
+                Gender = patient.Gender,
+                Phone = patient.Phone,
+                Address = patient.Address
+            };
+
+            return info;
+        }
     }
 }
