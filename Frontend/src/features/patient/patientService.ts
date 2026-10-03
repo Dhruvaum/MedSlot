@@ -1,7 +1,7 @@
 import { axiosClient } from "../../api/axiosClient";
-import type { ViewProfileResponse } from "./types";
+import type { ViewPatientProfileResponse } from "./types";
 
-export const viewProfileInfo = async (): Promise<ViewProfileResponse> => {
-    const response = await axiosClient.get<ViewProfileResponse>('/patients/viewProfileInfo');
+export const viewPatientProfile = async (): Promise<ViewPatientProfileResponse> => {
+    const response = await axiosClient.get<ViewPatientProfileResponse>('/patients/viewPatientProfile');
     return response.data;
 }
