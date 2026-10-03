@@ -1,6 +1,7 @@
 ﻿using MedSlot.Api.Common;
 using MedSlot.Api.Data;
 using MedSlot.Api.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace MedSlot.Api.Patients
 {
@@ -36,8 +37,9 @@ namespace MedSlot.Api.Patients
 
         public async Task<Patient?> GetPatientById(Guid patientId)
         {
-            Patient patient = await _context.Patients.FindAsync(patientId);
-            return patient;
+            return await _context.Patients
+                .Include(p => p.User)
+                .FirstOrDefaultAsync(p => p.Id == patientId);
         }
 
     }
