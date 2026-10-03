@@ -56,7 +56,7 @@ namespace MedSlot.Api.Patients
             };
         }
 
-        public async Task<ViewProfileInfoResponse> ViewProfileInfo()
+        public async Task<ViewPatientProfileResponse> ViewPatientProfile()
         {
             Guid? PatientId = _currentUser.PatientId;
 
@@ -71,11 +71,12 @@ namespace MedSlot.Api.Patients
                 throw new UnauthorizedAccessException();
             }
 
-            var info = new ViewProfileInfoResponse
+            var info = new ViewPatientProfileResponse
             {
                 FullName = patient.FullName,
                 Dob = patient.Dob,
                 Gender = patient.Gender,
+                Email = patient.User.Email,
                 Phone = patient.Phone,
                 Address = patient.Address
             };

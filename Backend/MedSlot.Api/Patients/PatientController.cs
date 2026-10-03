@@ -23,10 +23,10 @@ namespace MedSlot.Api.Patients
             return Ok(response);
         }
 
-        [HttpGet("viewProfileInfo")]
-        public async Task<ActionResult<ViewProfileInfoResponse>> ViewProfileInfo()
+        [HttpGet("viewPatientProfile")]
+        public async Task<ActionResult<ViewPatientProfileResponse>> ViewPatientProfile()
         {
-            var response = await _patientService.ViewProfileInfo();
+            var response = await _patientService.ViewPatientProfile();
             return Ok(response);
         }
     }
