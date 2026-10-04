@@ -6,7 +6,7 @@ import BackgroundDecoration from '../../components/BackgroundDecoration'
 const PatientLayout = () => {
   return (
     <>
-      <div className="flex min-h-screen overflow-hidden">
+      <div className="flex h-screen overflow-hidden">
         <BackgroundDecoration />
         <Sidebar />
         <div className="flex flex-1 flex-col overflow-hidden">
