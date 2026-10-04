@@ -13,20 +13,21 @@ Single clinic/tenant, search-and-book by specialty, concurrency-safe booking, re
 
 - ✅ Backend project scaffolded (ASP.NET Core Web API, .NET 8)
 - ✅ Frontend project scaffolded (React + Vite + TypeScript + Tailwind CSS)
-- 🚧 Database schema & EF Core setup
-- 📅 JWT authentication + role-based authorization (Patient/Doctor)
+- 🚧 Database schema & EF Core setup (patient/doctor schema done; appointment/payment schema pending)
+- ✅ JWT authentication + role-based authorization (Patient/Doctor)
 - 📅 Doctor verification during registration
-- 📅 Search-and-book flow (filter by specialty)
+- 🚧 Search-and-book flow (filter by specialty) — search and doctor profile browsing live; booking pending
 - 📅 Concurrency-safe appointment slot booking
 - 📅 Time-bound payment hold with auto-cancel
 - 📅 Real payment gateway integration (sandbox mode)
 - 📅 Escrow-style payment release, separate payment/refund records
 - 📅 Automated appointment reminder job (Hangfire)
 - 📅 Redis caching for slot-availability reads
-- 📅 Global exception-handling middleware + Serilog logging
+- ✅ Global exception-handling middleware
+- 📅 Serilog structured logging
 - 📅 xUnit + Moq test coverage
-- 📅 Swagger/OpenAPI documentation
-- 📅 Seeded synthetic data (Bogus)
+- ✅ Swagger/OpenAPI documentation
+- ✅ Seeded synthetic data (Bogus)
 - 📅 Deployed to Azure App Service + Azure SQL, with CI/CD
 
 ## Future (Post-MVP, unscheduled)

@@ -30,7 +30,7 @@ To provide the fastest, most convenient way for a patient to find and book a doc
 
 ## Architecture
 
-Coming soon.
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for the modular monolith structure, concurrency-control approach, and data-access design.
 
 ## Getting Started
 
@@ -54,7 +54,7 @@ npm run dev
 
 ## Project Status
 
-Actively in development. Backend and frontend projects are scaffolded; database schema and core booking flow are in progress.
+Actively in development. Patient registration, authentication, and profile management are live. Patients can search, filter, and browse verified doctors by name and specialty. Appointment booking and payments are the current focus — see [ROADMAP.md](./ROADMAP.md) for detailed progress.
 
 ## License
 
