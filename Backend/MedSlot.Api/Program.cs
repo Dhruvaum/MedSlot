@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using MedSlot.Api.Auth;
 using MedSlot.Api.Middleware;
 using MedSlot.Api.Patients;
+using MedSlot.Api.Doctors;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +12,31 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+// Swagger
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "Enter: Bearer {your token}"
+    });
+    options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference { Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme, Id = "Bearer" }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
+
 builder.Services.AddDbContext<MedSlotDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("MedSlotDb")));
 
 // Other Services
@@ -20,6 +45,7 @@ builder.Services.AddProblemDetails();
 builder.Services.AddAuthServices();
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddPatientServices();
+builder.Services.AddDoctorServices();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddOtherServices();
 
