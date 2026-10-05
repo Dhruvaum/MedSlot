@@ -35,7 +35,7 @@ Example:
     The backend already knows who's calling from the JWT (Authorization header) — putting your own ID in the URL is redundant and opens an unnecessary IDOR surface (someone tries swapping the GUID to see if authorization is enforced everywhere). Real apps don't route their own dashboard as `/users/{my-id}` — that pattern is reserved for viewing someone else's resource (e.g., a patient viewing `/doctor/{doctorId}` to see a specific doctor's public profile — that's a legitimate use of ID-in-URL).
 
 So, it's always like:
-`/complete-registration` and `/patient/dashboard` / `/doctor/dashboard`, no ID, identity comes from the token.
+`/complete-profile` and `/patient/` / `/doctor/`, no ID, identity comes from the token.
 
 # Developmental Learning
 
