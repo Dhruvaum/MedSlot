@@ -16,7 +16,13 @@ public partial class MedSlotDbContext : DbContext
     {
     }
 
+    public virtual DbSet<Appointment> Appointments { get; set; }
+
+    public virtual DbSet<AppointmentStatus> AppointmentStatuses { get; set; }
+
     public virtual DbSet<Doctor> Doctors { get; set; }
+
+    public virtual DbSet<DoctorAvailability> DoctorAvailabilities { get; set; }
 
     public virtual DbSet<Patient> Patients { get; set; }
 
@@ -24,20 +30,50 @@ public partial class MedSlotDbContext : DbContext
 
     public virtual DbSet<Specialization> Specializations { get; set; }
 
+    public virtual DbSet<TimeSlot> TimeSlots { get; set; }
+
     public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<UserType> UserTypes { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        if (!optionsBuilder.IsConfigured)
-        {
-            optionsBuilder.UseSqlServer("Server=LAPTOP-4ORBUCUD\\SQLEXPRESS;Database=MedSlot;Trusted_Connection=True;TrustServerCertificate=True;");
-        }
-    }
+        => optionsBuilder.UseSqlServer("Server=LAPTOP-4ORBUCUD\\SQLEXPRESS;Database=MedSlot;Trusted_Connection=True;TrustServerCertificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Appointment>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Appointm__3214EC07764AC0A2");
+
+            entity.HasIndex(e => e.TimeSlotId, "UQ_Appointments_TimeSlotId").IsUnique();
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+
+            entity.HasOne(d => d.AppointmentStatus).WithMany(p => p.Appointments)
+                .HasForeignKey(d => d.AppointmentStatusId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Appointments_AppointmentStatuses");
+
+            entity.HasOne(d => d.Patient).WithMany(p => p.Appointments)
+                .HasForeignKey(d => d.PatientId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Appointments_Patients");
+
+            entity.HasOne(d => d.TimeSlot).WithOne(p => p.Appointment)
+                .HasForeignKey<Appointment>(d => d.TimeSlotId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Appointments_TimeSlots");
+        });
+
+        modelBuilder.Entity<AppointmentStatus>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Appointm__3214EC07F59251B2");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.StatusName).HasMaxLength(50);
+        });
+
         modelBuilder.Entity<Doctor>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Doctors__3214EC076A5E2472");
@@ -65,6 +101,20 @@ public partial class MedSlotDbContext : DbContext
                 .HasForeignKey<Doctor>(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Doctors_Users");
+        });
+
+        modelBuilder.Entity<DoctorAvailability>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__DoctorAv__3214EC07E1FB74D1");
+
+            entity.ToTable("DoctorAvailability");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+
+            entity.HasOne(d => d.Doctor).WithMany(p => p.DoctorAvailabilities)
+                .HasForeignKey(d => d.DoctorId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_DoctorAvailability_Doctors");
         });
 
         modelBuilder.Entity<Patient>(entity =>
@@ -100,6 +150,22 @@ public partial class MedSlotDbContext : DbContext
 
             entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Name).HasMaxLength(100);
+        });
+
+        modelBuilder.Entity<TimeSlot>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__TimeSlot__3214EC0703960429");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.RowVersion)
+                .IsRowVersion()
+                .IsConcurrencyToken();
+
+            entity.HasOne(d => d.Doctor).WithMany(p => p.TimeSlots)
+                .HasForeignKey(d => d.DoctorId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_TimeSlots_Doctors");
         });
 
         modelBuilder.Entity<User>(entity =>

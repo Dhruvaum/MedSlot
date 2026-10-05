@@ -25,9 +25,13 @@ public partial class Doctor
 
     public int VerificationStatus { get; set; }
 
+    public virtual ICollection<DoctorAvailability> DoctorAvailabilities { get; set; } = new List<DoctorAvailability>();
+
     public virtual Qualification Qualification { get; set; } = null!;
 
     public virtual Specialization Specialization { get; set; } = null!;
+
+    public virtual ICollection<TimeSlot> TimeSlots { get; set; } = new List<TimeSlot>();
 
     public virtual User User { get; set; } = null!;
 }
