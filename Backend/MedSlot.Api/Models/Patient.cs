@@ -19,5 +19,7 @@ public partial class Patient
 
     public string Address { get; set; } = null!;
 
+    public virtual ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
+
     public virtual User User { get; set; } = null!;
 }
