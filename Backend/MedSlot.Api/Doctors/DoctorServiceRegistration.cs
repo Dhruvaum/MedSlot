@@ -6,6 +6,7 @@
         {
             services.AddScoped<IDoctorService, DoctorService>();
             services.AddScoped<IDoctorRepository, DoctorRepository>();
+            services.AddScoped<IDoctorAvailabilityService, DoctorService>();
 
             return services;
         }

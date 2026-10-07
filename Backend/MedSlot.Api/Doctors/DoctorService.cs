@@ -112,10 +112,50 @@ namespace MedSlot.Api.Doctors
 
             await _doctorRepository.SetAvailabilityAsync(doctorId, availabilities);
         }
-        public async Task<List<DoctorAvailability>> GetAvailabilityAsync(Guid doctorId)
+        public async Task<DoctorAvailabilityResponse> GetAvailabilityAsync()
         {
+            Guid doctorId = _currentUser.DoctorId ?? throw new UnauthorizedAccessException();
+
             var availabilities = await _doctorRepository.GetAvailabilityByDoctorIdAsync(doctorId);
-            return availabilities;
+
+            var days = new List<DayAvailability>();
+
+            // Map DoctorAvailabilities to DayAvailabilities
+            foreach (DayOfWeek day in Enum.GetValues<DayOfWeek>())
+            {
+                var dayRows = availabilities.Where(a => (DayOfWeek)a.DayOfWeek == day)
+                                            .OrderBy(a => a.StartTime)
+                                            .ToList();
+
+                if(dayRows.Count == 0)
+                {
+                    days.Add(new DayAvailability { DayOfWeek = day, IsOff = true });
+                }
+
+                else if(dayRows.Count == 1)
+                {
+                    days.Add(new DayAvailability
+                    {
+                        DayOfWeek = day,
+                        StartTime = dayRows[0].StartTime,
+                        EndTime = dayRows[0].EndTime,
+                    });
+                }
+
+                else
+                {
+                    days.Add(new DayAvailability
+                    {
+                        DayOfWeek = day,
+                        StartTime = dayRows[0].StartTime,
+                        BreakStartTime = dayRows[0].EndTime,
+                        BreakEndTime = dayRows[1].StartTime,
+                        EndTime = dayRows[1].EndTime,
+                    });
+                }
+            }
+
+            return new DoctorAvailabilityResponse { Days = days };
         }
 
     }
