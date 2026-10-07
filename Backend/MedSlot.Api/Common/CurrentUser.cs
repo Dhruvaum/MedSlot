@@ -20,5 +20,6 @@ namespace MedSlot.Api.Common
         public string? Role => _user?.FindFirstValue("role");
 
         public Guid? PatientId => Guid.TryParse(_user?.FindFirstValue("patientId"), out var patientId) ? patientId : null;
+        public Guid? DoctorId => Guid.TryParse(_user?.FindFirstValue("doctorId"), out var doctorId) ? doctorId : null;
     }
 }

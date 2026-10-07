@@ -6,5 +6,6 @@
         string? Role { get; }
         bool IsAuthenticated { get; }
         Guid? PatientId { get; }
+        Guid? DoctorId { get; }
     }
 }

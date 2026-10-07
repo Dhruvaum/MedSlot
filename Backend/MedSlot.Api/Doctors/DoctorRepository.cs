@@ -61,5 +61,23 @@ namespace MedSlot.Api.Doctors
 
             return doctor;
         }
+
+        public async Task SetAvailabilityAsync(Guid doctorId, List<DoctorAvailability> newRows)
+        {
+            var existingRows = await _context.DoctorAvailabilities
+                .Where(a => a.DoctorId == doctorId)
+                .ToListAsync();
+
+            _context.DoctorAvailabilities.RemoveRange(existingRows);
+            await _context.AddRangeAsync(newRows);
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<DoctorAvailability>> GetAvailabilityByDoctorIdAsync(Guid doctorId)
+        {
+            var availabilities = await _context.DoctorAvailabilities.Where(a => a.DoctorId == doctorId).ToListAsync();
+            return availabilities;
+        }
     }
 }
