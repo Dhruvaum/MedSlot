@@ -2,6 +2,7 @@
 using MedSlot.Api.Common.Dtos;
 using MedSlot.Api.Doctors.Dtos;
 using MedSlot.Api.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace MedSlot.Api.Doctors
 {
@@ -66,6 +67,8 @@ namespace MedSlot.Api.Doctors
         // Doctor Availability
         public async Task SetAvailabilityAsync(SetDoctorAvailabilityRequest request)
         {
+            if (request.ConsultDurationMinutes <= 0) throw new DbUpdateException("Consultation Time is required to Proceed");
+            
             Guid doctorId = _currentUser.DoctorId ?? throw new UnauthorizedAccessException();
             
             // Map DayAvailability request to DoctorAvailability
@@ -110,13 +113,16 @@ namespace MedSlot.Api.Doctors
                 }
             }
 
-            await _doctorRepository.SetAvailabilityAsync(doctorId, availabilities);
+            await _doctorRepository.SetAvailabilityAsync(doctorId, request.ConsultDurationMinutes, availabilities);
         }
         public async Task<DoctorAvailabilityResponse> GetAvailabilityAsync()
         {
             Guid doctorId = _currentUser.DoctorId ?? throw new UnauthorizedAccessException();
 
-            var availabilities = await _doctorRepository.GetAvailabilityByDoctorIdAsync(doctorId);
+            var (availabilities, consultDurationMinutes) = await _doctorRepository.GetAvailabilityByDoctorIdAsync(doctorId);
+
+            if (consultDurationMinutes == null && availabilities.Count == 0) return new DoctorAvailabilityResponse { Days = null, ConsultDurationMinutes = 0 };
+            else if (consultDurationMinutes != null && availabilities.Count == 0) return new DoctorAvailabilityResponse { Days = null, ConsultDurationMinutes = consultDurationMinutes };
 
             var days = new List<DayAvailability>();
 
@@ -155,7 +161,7 @@ namespace MedSlot.Api.Doctors
                 }
             }
 
-            return new DoctorAvailabilityResponse { Days = days };
+            return new DoctorAvailabilityResponse { Days = days, ConsultDurationMinutes = consultDurationMinutes };
         }
 
     }

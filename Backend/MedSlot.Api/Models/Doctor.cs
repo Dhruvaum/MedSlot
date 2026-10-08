@@ -25,6 +25,8 @@ public partial class Doctor
 
     public int VerificationStatus { get; set; }
 
+    public int? ConsultDurationMinutes { get; set; }
+
     public virtual ICollection<DoctorAvailability> DoctorAvailabilities { get; set; } = new List<DoctorAvailability>();
 
     public virtual Qualification Qualification { get; set; } = null!;

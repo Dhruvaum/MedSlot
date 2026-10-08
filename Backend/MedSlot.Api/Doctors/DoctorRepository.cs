@@ -14,6 +14,11 @@ namespace MedSlot.Api.Doctors
             _context = context;
         }
 
+        public async Task<List<Doctor>> GetDoctorsAsync()
+        {
+            var doctors = await _context.Doctors.ToListAsync();
+            return doctors;
+        }
         public async Task<(List<Doctor> Items, int TotalCount)> GetDoctorsListingAsync(GetDoctorsListingRequest request)
         {
             //Get Queriable Doctor Data
@@ -62,22 +67,28 @@ namespace MedSlot.Api.Doctors
             return doctor;
         }
 
-        public async Task SetAvailabilityAsync(Guid doctorId, List<DoctorAvailability> newRows)
+        public async Task SetAvailabilityAsync(Guid doctorId, int consultDurationMinutes, List<DoctorAvailability> newRows)
         {
             var existingRows = await _context.DoctorAvailabilities
                 .Where(a => a.DoctorId == doctorId)
                 .ToListAsync();
 
             _context.DoctorAvailabilities.RemoveRange(existingRows);
-            await _context.AddRangeAsync(newRows);
 
+            // Set ConsultaionTime
+            var doctor = await _context.Doctors.FirstOrDefaultAsync(d => d.Id == doctorId);
+            doctor.ConsultDurationMinutes = consultDurationMinutes;
+
+            await _context.DoctorAvailabilities.AddRangeAsync(newRows);
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<DoctorAvailability>> GetAvailabilityByDoctorIdAsync(Guid doctorId)
+        public async Task<(List<DoctorAvailability> availabilities, int? ConsultDurationMinutes)> GetAvailabilityByDoctorIdAsync(Guid doctorId)
         {
             var availabilities = await _context.DoctorAvailabilities.Where(a => a.DoctorId == doctorId).ToListAsync();
-            return availabilities;
+            Doctor doctor = await _context.Doctors.FirstOrDefaultAsync(d => d.Id == doctorId);
+
+            return (availabilities, doctor?.ConsultDurationMinutes);
         }
     }
 }

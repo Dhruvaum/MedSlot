@@ -4,6 +4,8 @@ using MedSlot.Api.Auth;
 using MedSlot.Api.Middleware;
 using MedSlot.Api.Patients;
 using MedSlot.Api.Doctors;
+using Hangfire;
+using MedSlot.Api.BackgroundJobs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +51,10 @@ builder.Services.AddDoctorServices();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddOtherServices();
 
+// Hangfire
+builder.Services.AddHangfire(config => config.UseSqlServerStorage(builder.Configuration.GetConnectionString("MedSlotDb")));
+builder.Services.AddHangfireServer();
+
 // CORS Configuration
 builder.Services.AddCors(options =>
 {
@@ -62,12 +68,24 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+// Register Recurring Job
+using (var scope = app.Services.CreateScope())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    var recurringJobManager = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
+    recurringJobManager.AddOrUpdate<TimeSlotGenerationJob>(
+        "generate-timeslots",
+        job => job.RunAsync(),
+        "30 20 * * *"
+    );
 }
+
+    // Configure the HTTP request pipeline.
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+        app.UseHangfireDashboard("/hangfire");
+    }
 app.UseExceptionHandler();
 
 app.UseHttpsRedirection();

@@ -3,6 +3,7 @@
     public class SetDoctorAvailabilityRequest
     {
         public List<DayAvailability> Days { get; set; } = new();
+        public int ConsultDurationMinutes { get; set; }
     }
 
 }
