@@ -1,8 +1,10 @@
-﻿using MedSlot.Api.Common;
+﻿using MedSlot.Api.Auth;
+using MedSlot.Api.Common;
 using MedSlot.Api.Common.Dtos;
 using MedSlot.Api.Doctors.Dtos;
 using MedSlot.Api.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace MedSlot.Api.Doctors
 {
@@ -10,11 +12,58 @@ namespace MedSlot.Api.Doctors
     {
         private IDoctorRepository _doctorRepository;
         private readonly ICurrentUser _currentUser;
+        private readonly ITokenService _tokenService;
 
-        public DoctorService(IDoctorRepository doctorRepository, ICurrentUser currentUser)
+        public DoctorService(IDoctorRepository doctorRepository, ICurrentUser currentUser, ITokenService tokenService)
         {
             _doctorRepository = doctorRepository;
             _currentUser = currentUser;
+            _tokenService = tokenService;
+        }
+
+        public async Task<List<Specialization>> GetSpecializationOptionsAsync()
+        {
+            var specializations = await _doctorRepository.GetAllSpecializationsAsync();
+            return specializations;
+        }
+
+        public async Task<List<Qualification>> GetQualificationOptionsAsync()
+        {
+            return await _doctorRepository.GetAllQualificationsAsync();
+        }
+
+        public async Task<List<RegisteringCouncil>> GetRegisteringCouncilOptionsAsync()
+        {
+            return await _doctorRepository.GetAllRegisteringCouncilsAsync();
+        }
+
+        public async Task<CompleteProfileResponse> CompleteProfileAsync(CompleteProfileRequest request)
+        {
+            var userId = _currentUser.UserId ?? throw new UnauthorizedAccessException();
+            var doctorId = Guid.NewGuid();
+
+            var doctor = new Doctor
+            {
+                Id = doctorId,
+                UserId = userId,
+                FullName = request.FullName,
+                Phone = request.Phone,
+                SpecializationId = request.SpecializationId,
+                QualificationId = request.QualificationId,
+                RegistrationNumber = request.RegistrationNumber,
+                RegisteringCouncilId = request.RegisteringCouncilId,
+                WorkAddress = request.WorkAddress,
+                VerificationStatus = 0
+            };
+
+            await _doctorRepository.AddDoctorAsync(doctor);
+            await _doctorRepository.MarkUserRegistrationCompleteAsync(userId);
+            await _doctorRepository.SaveChangesAsync();
+
+            var token = _tokenService.GenerateToken(userId, "Doctor", new Claim("doctorId", doctorId.ToString()));
+
+            return new CompleteProfileResponse { AuthToken = token };
+
         }
 
         public async Task<PagedResponse<DoctorSummaryResponse>> GetDoctorsListingAsync(GetDoctorsListingRequest request)
@@ -56,7 +105,7 @@ namespace MedSlot.Api.Doctors
                 SpecializationName = doctorData.Specialization?.Name,
                 QualificationName = doctorData.Qualification?.Name,
                 RegistrationNumber = doctorData.RegistrationNumber,
-                RegisteringCouncil = doctorData.RegisteringCouncil,
+                RegisteringCouncil = doctorData.RegisteringCouncil?.Name,
                 WorkAddress = doctorData.WorkAddress
             };
 
@@ -120,9 +169,6 @@ namespace MedSlot.Api.Doctors
             Guid doctorId = _currentUser.DoctorId ?? throw new UnauthorizedAccessException();
 
             var (availabilities, consultDurationMinutes) = await _doctorRepository.GetAvailabilityByDoctorIdAsync(doctorId);
-
-            if (consultDurationMinutes == null && availabilities.Count == 0) return new DoctorAvailabilityResponse { Days = null, ConsultDurationMinutes = 0 };
-            else if (consultDurationMinutes != null && availabilities.Count == 0) return new DoctorAvailabilityResponse { Days = null, ConsultDurationMinutes = consultDurationMinutes };
 
             var days = new List<DayAvailability>();
 

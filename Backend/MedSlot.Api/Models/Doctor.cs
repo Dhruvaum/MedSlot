@@ -17,8 +17,6 @@ public partial class Doctor
 
     public string RegistrationNumber { get; set; } = null!;
 
-    public string RegisteringCouncil { get; set; } = null!;
-
     public Guid QualificationId { get; set; }
 
     public string WorkAddress { get; set; } = null!;
@@ -27,9 +25,13 @@ public partial class Doctor
 
     public int? ConsultDurationMinutes { get; set; }
 
+    public Guid? RegisteringCouncilId { get; set; }
+
     public virtual ICollection<DoctorAvailability> DoctorAvailabilities { get; set; } = new List<DoctorAvailability>();
 
     public virtual Qualification Qualification { get; set; } = null!;
+
+    public virtual RegisteringCouncil? RegisteringCouncil { get; set; }
 
     public virtual Specialization Specialization { get; set; } = null!;
 

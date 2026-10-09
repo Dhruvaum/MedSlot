@@ -6,6 +6,7 @@ using MedSlot.Api.Patients;
 using MedSlot.Api.Doctors;
 using Hangfire;
 using MedSlot.Api.BackgroundJobs;
+using MedSlot.Api.Appointments;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,8 @@ builder.Services.AddEndpointsApiExplorer();
 // Swagger
 builder.Services.AddSwaggerGen(options =>
 {
+    options.CustomSchemaIds(type => type.FullName);
+
     options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -48,6 +51,7 @@ builder.Services.AddAuthServices();
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddPatientServices();
 builder.Services.AddDoctorServices();
+builder.Services.AddAppointmentServices();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddOtherServices();
 
