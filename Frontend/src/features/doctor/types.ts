@@ -1,3 +1,18 @@
+export interface SpecializationOptions{
+    id: string,
+    name: string
+}
+
+export interface QualificationOptions{
+    id: string,
+    name: string
+}
+
+export interface RegisteringCouncilOptions{
+    id: string,
+    name: string
+}
+
 export interface GetDoctorsListingRequest{
     search?: string,
     specializationId?: string,
