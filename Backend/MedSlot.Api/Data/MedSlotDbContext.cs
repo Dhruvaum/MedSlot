@@ -28,6 +28,8 @@ public partial class MedSlotDbContext : DbContext
 
     public virtual DbSet<Qualification> Qualifications { get; set; }
 
+    public virtual DbSet<RegisteringCouncil> RegisteringCouncils { get; set; }
+
     public virtual DbSet<Specialization> Specializations { get; set; }
 
     public virtual DbSet<TimeSlot> TimeSlots { get; set; }
@@ -84,7 +86,6 @@ public partial class MedSlotDbContext : DbContext
             entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.FullName).HasMaxLength(150);
             entity.Property(e => e.Phone).HasMaxLength(20);
-            entity.Property(e => e.RegisteringCouncil).HasMaxLength(150);
             entity.Property(e => e.RegistrationNumber).HasMaxLength(50);
             entity.Property(e => e.WorkAddress).HasMaxLength(500);
 
@@ -92,6 +93,10 @@ public partial class MedSlotDbContext : DbContext
                 .HasForeignKey(d => d.QualificationId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Doctors_Qualifications");
+
+            entity.HasOne(d => d.RegisteringCouncil).WithMany(p => p.Doctors)
+                .HasForeignKey(d => d.RegisteringCouncilId)
+                .HasConstraintName("FK_Doctors_RegisteringCouncils");
 
             entity.HasOne(d => d.Specialization).WithMany(p => p.Doctors)
                 .HasForeignKey(d => d.SpecializationId)
@@ -140,6 +145,14 @@ public partial class MedSlotDbContext : DbContext
         modelBuilder.Entity<Qualification>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Qualific__3214EC07056BA31C");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Name).HasMaxLength(150);
+        });
+
+        modelBuilder.Entity<RegisteringCouncil>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Register__3214EC0740EA789B");
 
             entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Name).HasMaxLength(150);

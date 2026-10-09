@@ -14,11 +14,44 @@ namespace MedSlot.Api.Doctors
             _context = context;
         }
 
+        public async Task AddDoctorAsync(Doctor doctor)
+        {
+            await _context.Doctors.AddAsync(doctor);
+        }
+
+        public async Task MarkUserRegistrationCompleteAsync(Guid userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            user.IsRegistrationCompleted = true;
+        }
+
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<Specialization>> GetAllSpecializationsAsync()
+        {
+            var specializations = await _context.Specializations.ToListAsync();
+            return specializations;
+        }
+
+        public async Task<List<Qualification>> GetAllQualificationsAsync()
+        {
+            return await _context.Qualifications.ToListAsync();
+        }
+
+        public async Task<List<RegisteringCouncil>> GetAllRegisteringCouncilsAsync()
+        {
+            return await _context.RegisteringCouncils.ToListAsync();
+        }
+
         public async Task<List<Doctor>> GetDoctorsAsync()
         {
             var doctors = await _context.Doctors.ToListAsync();
             return doctors;
         }
+
         public async Task<(List<Doctor> Items, int TotalCount)> GetDoctorsListingAsync(GetDoctorsListingRequest request)
         {
             //Get Queriable Doctor Data

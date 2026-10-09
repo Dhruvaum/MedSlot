@@ -23,6 +23,7 @@ namespace MedSlot.Api.Data.Seeding
 
             var specializationIds = await _context.Specializations.Select(s => s.Id).ToListAsync();
             var qualificationIds = await _context.Qualifications.Select(q => q.Id).ToListAsync();
+            var registeringCouncilIds = await _context.RegisteringCouncils.Select(c => c.Id).ToListAsync();
 
             var userFaker = new Faker<User>()
                 .RuleFor(u => u.Id, f => Guid.NewGuid())
@@ -43,7 +44,7 @@ namespace MedSlot.Api.Data.Seeding
                 .RuleFor(d => d.SpecializationId, f => f.PickRandom(specializationIds))
                 .RuleFor(d => d.QualificationId, f => f.PickRandom(qualificationIds))
                 .RuleFor(d => d.RegistrationNumber, f => f.Random.AlphaNumeric(10))
-                .RuleFor(d => d.RegisteringCouncil, f => "State Medical Council")
+                .RuleFor(d => d.RegisteringCouncilId, f => f.PickRandom(registeringCouncilIds))
                 .RuleFor(d => d.WorkAddress, f => f.Address.FullAddress())
                 .RuleFor(d => d.VerificationStatus, f => f.Random.Number(0, 1));
 
