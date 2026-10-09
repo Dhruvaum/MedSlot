@@ -1,6 +1,7 @@
 import { createBrowserRouter } from "react-router-dom"
 import Layout from "../components/Layout"
 import PatientLayout from "../pages/Patient/PatientLayout"
+import DoctorLayout from "../pages/Doctor/DoctorLayout"
 
 const router = createBrowserRouter([
     {
@@ -71,6 +72,19 @@ const router = createBrowserRouter([
                 path: 'profile',
                 lazy: async () => ({
                     Component: (await import('../pages/Patient/Profile/ProfilePage')).default
+                })
+            }
+        ]
+    },
+
+    {
+        path: '/doctor',
+        element: <DoctorLayout />,
+        children: [
+            {
+                index: true,
+                lazy: async () => ({
+                    Component: (await import('../pages/Doctor/Home/HomePage')).default
                 })
             }
         ]
