@@ -98,21 +98,31 @@ namespace MedSlot.Api.Doctors
             var doctorData = await _doctorRepository.GetDoctorByIdAsync(doctorId);
 
             // Map doctorData with Response Model
-            var doctor = new ViewDoctorProfileResponse
-            {
-                Id = doctorData.Id,
-                FullName = doctorData.FullName,
-                SpecializationName = doctorData.Specialization?.Name,
-                QualificationName = doctorData.Qualification?.Name,
-                RegistrationNumber = doctorData.RegistrationNumber,
-                RegisteringCouncil = doctorData.RegisteringCouncil?.Name,
-                WorkAddress = doctorData.WorkAddress
-            };
-
-            return doctor;
+            return MapToViewDoctorProfileResponse(doctorData);
         }
 
-        
+        public async Task<ViewDoctorProfileResponse> ViewMyProfileAsync()
+        {
+            // Get doctor by Id
+            var doctorId = _currentUser.DoctorId ?? throw new UnauthorizedAccessException();
+            var doctorData = await _doctorRepository.GetDoctorByIdAsync(doctorId);
+
+            // Map doctorData with Response Model
+            return MapToViewDoctorProfileResponse(doctorData);
+        }
+
+        private static ViewDoctorProfileResponse MapToViewDoctorProfileResponse(Doctor doctorData) => new()
+        {
+            Id = doctorData.Id,
+            FullName = doctorData.FullName,
+            SpecializationName = doctorData.Specialization?.Name,
+            QualificationName = doctorData.Qualification?.Name,
+            RegistrationNumber = doctorData.RegistrationNumber,
+            RegisteringCouncil = doctorData.RegisteringCouncil?.Name,
+            WorkAddress = doctorData.WorkAddress
+        };
+
+
         // Doctor Availability
         public async Task SetAvailabilityAsync(SetDoctorAvailabilityRequest request)
         {

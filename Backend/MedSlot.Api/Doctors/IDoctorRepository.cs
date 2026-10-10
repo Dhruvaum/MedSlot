@@ -11,7 +11,7 @@ namespace MedSlot.Api.Doctors
         public Task<List<Specialization>> GetAllSpecializationsAsync();
         public Task<List<Qualification>> GetAllQualificationsAsync();
         public Task<List<RegisteringCouncil>> GetAllRegisteringCouncilsAsync(); 
-        public Task<List<Doctor>> GetDoctorsAsync();
+        public Task<List<Doctor>> GetVerifiedDoctorsAsync();
         public Task<(List<Doctor> Items, int TotalCount)> GetDoctorsListingAsync(GetDoctorsListingRequest request);
         public Task<Doctor> GetDoctorByIdAsync(Guid Id);
 

@@ -46,9 +46,9 @@ namespace MedSlot.Api.Doctors
             return await _context.RegisteringCouncils.ToListAsync();
         }
 
-        public async Task<List<Doctor>> GetDoctorsAsync()
+        public async Task<List<Doctor>> GetVerifiedDoctorsAsync()
         {
-            var doctors = await _context.Doctors.ToListAsync();
+            var doctors = await _context.Doctors.Where(d => d.VerificationStatus == 1).ToListAsync();
             return doctors;
         }
 
@@ -93,6 +93,7 @@ namespace MedSlot.Api.Doctors
             var query = _context.Doctors
                 .Include(d => d.Specialization)
                 .Include(d => d.Qualification)
+                .Include(d => d.RegisteringCouncil)
                 .Where(d => d.Id == doctorId);
 
             var doctor = await query.FirstOrDefaultAsync();
