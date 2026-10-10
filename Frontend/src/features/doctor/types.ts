@@ -1,3 +1,5 @@
+import type { DayOfWeek } from "../../types/common"
+
 export interface SpecializationOptions{
     id: string,
     name: string
@@ -37,4 +39,18 @@ export interface ViewDoctorProfileResponse{
     registrationNumber: string,
     registeringCouncil: string,
     workAddress: string
+}
+
+export interface DayAvailability{
+    dayOfWeek: DayOfWeek,
+    isOff: boolean,
+    startTime: string | null,
+    endTime: string | null,
+    breakStartTime: string | null,
+    breakEndTime: string | null
+}
+
+export interface DoctorAvailability{
+    days: DayAvailability[],
+    consultDurationMinutes: number
 }
