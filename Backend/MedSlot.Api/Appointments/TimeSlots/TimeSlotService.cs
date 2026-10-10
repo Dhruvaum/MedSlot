@@ -18,7 +18,7 @@ namespace MedSlot.Api.Appointments.TimeSlots
 
         public async Task GenerateSlotsAsync()
         {
-            var doctors = await _doctorRepository.GetDoctorsAsync();
+            var doctors = await _doctorRepository.GetVerifiedDoctorsAsync();
             if (doctors == null || doctors.Count == 0) return;
 
             var today = DateTime.UtcNow.Date;

@@ -1,4 +1,5 @@
-﻿using MedSlot.Api.Models;
+﻿using MedSlot.Api.Appointments.TimeSlots.Dtos;
+using MedSlot.Api.Models;
 
 namespace MedSlot.Api.Appointments.TimeSlots
 {
@@ -6,5 +7,6 @@ namespace MedSlot.Api.Appointments.TimeSlots
     {
         Task<DateTime?> GetLastSlotDate(Guid doctorId);
         Task AddTimeSlotsAsync(List<TimeSlot> slots);
+        Task<AvailableSlotResponse> GetAvailableSlotsByDoctorId(Guid doctorId);
     }
 }

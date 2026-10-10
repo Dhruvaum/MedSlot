@@ -64,5 +64,13 @@ namespace MedSlot.Api.Doctors
             var response = await _doctorService.ViewDoctorProfileAsync(doctorId);
             return Ok(response);
         }
+
+        [HttpGet("viewMyProfile")]
+        [Authorize(Roles = "Doctor")]
+        public async Task<ActionResult<ViewDoctorProfileResponse>> ViewMyProfile()
+        {
+            var response = await _doctorService.ViewMyProfileAsync();
+            return Ok(response);
+        }
     }
 }
