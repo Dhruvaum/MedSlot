@@ -1,4 +1,5 @@
-﻿using MedSlot.Api.Data;
+﻿using MedSlot.Api.Appointments.TimeSlots.Dtos;
+using MedSlot.Api.Data;
 using MedSlot.Api.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,5 +28,18 @@ namespace MedSlot.Api.Appointments.TimeSlots
             await _context.TimeSlots.AddRangeAsync(slots);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<List<TimeSlot>> GetBookableSlotsByDoctorId(Guid doctorId)
+        {
+            var today = DateTime.UtcNow;
+            
+            var timeSlots = await _context.TimeSlots
+                .Where(t => t.DoctorId == doctorId && t.IsBooked == false && t.StartTime >= today)
+                .OrderBy(t => t.StartTime)
+                .ToListAsync();
+
+            return timeSlots;
+        }
+        
     }
 }
