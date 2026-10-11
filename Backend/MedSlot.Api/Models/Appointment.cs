@@ -17,6 +17,8 @@ public partial class Appointment
 
     public DateTime CreatedAt { get; set; }
 
+    public string? PatientConcern { get; set; }
+
     public virtual AppointmentStatus AppointmentStatus { get; set; } = null!;
 
     public virtual Patient Patient { get; set; } = null!;

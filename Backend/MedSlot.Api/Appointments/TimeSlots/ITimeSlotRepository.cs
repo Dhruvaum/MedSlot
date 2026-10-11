@@ -7,6 +7,6 @@ namespace MedSlot.Api.Appointments.TimeSlots
     {
         Task<DateTime?> GetLastSlotDate(Guid doctorId);
         Task AddTimeSlotsAsync(List<TimeSlot> slots);
-        Task<AvailableSlotResponse> GetAvailableSlotsByDoctorId(Guid doctorId);
+        Task<List<TimeSlot>> GetBookableSlotsByDoctorId(Guid doctorId);
     }
 }

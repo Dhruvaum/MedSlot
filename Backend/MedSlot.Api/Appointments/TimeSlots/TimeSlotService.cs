@@ -1,4 +1,5 @@
-﻿using MedSlot.Api.Doctors;
+﻿using MedSlot.Api.Appointments.TimeSlots.Dtos;
+using MedSlot.Api.Doctors;
 using MedSlot.Api.Doctors.Dtos;
 using MedSlot.Api.Models;
 
@@ -74,6 +75,30 @@ namespace MedSlot.Api.Appointments.TimeSlots
             }
 
         }
+
+        public async Task<List<AvailableSlot>> GetAvailableSlotsAsync(GetAvailableSlotsRequest request)
+        {
+            var doctorId = request.DoctorId;
+            if (doctorId == Guid.Empty) throw new ArgumentException();
+
+            var timeSlots = await _repository.GetBookableSlotsByDoctorId(doctorId);
+
+            var availableSlots = new List<AvailableSlot>();
+
+            foreach( var timeSlot in timeSlots)
+            {
+                var slot = new AvailableSlot
+                {
+                    Id = timeSlot.Id,
+                    StartTime = timeSlot.StartTime,
+                    EndTime = timeSlot.EndTime,
+                };
+                availableSlots.Add(slot);
+            }
+
+            return availableSlots; 
+        }
+
 
     }
 }

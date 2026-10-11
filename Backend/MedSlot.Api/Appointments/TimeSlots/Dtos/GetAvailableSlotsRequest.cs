@@ -2,5 +2,6 @@
 {
     public class GetAvailableSlotsRequest
     {
+        public Guid DoctorId { get; set; }
     }
 }

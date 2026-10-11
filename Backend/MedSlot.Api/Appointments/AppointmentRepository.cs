@@ -14,7 +14,8 @@ namespace MedSlot.Api.Appointments
 
         public async Task<BookAppointmentResponse> BookAppointmentAsync(BookAppointmentRequest request)
         {
-
+            var response = new BookAppointmentResponse();
+            return response;
         }
     }
 }

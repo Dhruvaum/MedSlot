@@ -5,6 +5,6 @@ namespace MedSlot.Api.Appointments.TimeSlots
     public interface ITimeSlotService
     {
         Task GenerateSlotsAsync();
-        Task<AvailableSlotResponse> GetAvailableSlotsAsync(GetAvailableSlotsRequest request);
+        Task<List<AvailableSlot>> GetAvailableSlotsAsync(GetAvailableSlotsRequest request);
     }
 }
