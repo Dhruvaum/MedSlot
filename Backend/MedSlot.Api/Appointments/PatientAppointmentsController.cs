@@ -33,5 +33,12 @@ namespace MedSlot.Api.Appointments
             var response = await _appointmentService.BookAppointmentAsync(request);
             return Ok(response);
         }
+
+        [HttpGet("getMyAppointments")]
+        public async Task<ActionResult<AppointmentSummaryResponse>> GetMyAppointments()
+        {
+            var response = await _appointmentService.GetMyAppointmentsAsync();
+            return Ok(response);
+        }
     }
 }
