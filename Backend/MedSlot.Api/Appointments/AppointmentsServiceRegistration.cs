@@ -8,6 +8,8 @@ namespace MedSlot.Api.Appointments
         {
             services.AddScoped<ITimeSlotService, TimeSlotService>();
             services.AddScoped<ITimeSlotRepository, TimeSlotRepository>();
+            services.AddScoped<IAppointmentService, AppointmentService>();
+            services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 
             return services;
         }
