@@ -44,7 +44,7 @@ const FindDoctorPage = () => {
 
         <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[320px_1fr_320px]">
           {/* Left — Booking panel */}
-          <div className="order-2 lg:order-1">
+          <div className="order-2 flex min-h-[80vh] flex-col lg:order-1">
             <BookingPanel
               isBookingActive={!!bookingDoctorId}
               isLoadingSlots={isLoadingSlots}
@@ -131,7 +131,7 @@ const FindDoctorPage = () => {
           </div>
 
           {/* Right — Doctor detail */}
-          <div className="order-3">
+          <div className="order-3 flex min-h-[80vh] flex-col">
             <DoctorDetailPanel isLoading={isLoadingDetail} doctor={doctorDetail} />
           </div>
         </div>

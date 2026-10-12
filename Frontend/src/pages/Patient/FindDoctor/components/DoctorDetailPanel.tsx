@@ -9,7 +9,7 @@ interface DoctorDetailPanelProps {
 const DoctorDetailPanel = ({ isLoading, doctor }: DoctorDetailPanelProps) => {
   if (!doctor) {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-200 bg-white p-6 text-center">
+      <div className="flex flex-1 flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-200 bg-white p-6 text-center">
         <Stethoscope size={32} className="text-slate-300" />
         <p className="text-sm text-slate-400">
           Click <span className="font-medium text-slate-500">Detail</span> on a doctor to see their profile here.
@@ -20,7 +20,7 @@ const DoctorDetailPanel = ({ isLoading, doctor }: DoctorDetailPanelProps) => {
 
   if (isLoading) {
     return (
-      <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+      <div className="flex-1 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
         <div className="py-10 text-center text-sm text-slate-400">Loading...</div>
       </div>
     )
@@ -34,7 +34,7 @@ const DoctorDetailPanel = ({ isLoading, doctor }: DoctorDetailPanelProps) => {
   ]
 
   return (
-    <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+    <div className="flex-1 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
       <div className="flex flex-col items-center gap-3 border-b border-slate-100 pb-6 text-center">
         <div className="flex h-20 w-20 items-center justify-center rounded-full bg-brand/10">
           <Stethoscope size={36} className="text-brand" />

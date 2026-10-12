@@ -36,7 +36,7 @@ const BookingPanel = ({
 }: BookingPanelProps) => {
   if (!isBookingActive) {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-200 bg-white p-6 text-center">
+      <div className="flex flex-1 flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-200 bg-white p-6 text-center">
         <CalendarDays size={32} className="text-slate-300" />
         <p className="text-sm text-slate-400">
           Click <span className="font-medium text-slate-500">Book Now</span> on a doctor to start booking an appointment.
@@ -46,7 +46,7 @@ const BookingPanel = ({
   }
 
   return (
-    <div className="flex h-full flex-col gap-5 rounded-2xl border border-brand/20 bg-white p-5 shadow-sm">
+    <div className="flex flex-1 flex-col gap-5 rounded-2xl border border-brand/20 bg-white p-5 shadow-sm">
       <div>
         <h2 className="flex items-center gap-2 text-sm font-semibold text-slate-800">
           <CalendarDays size={16} className="text-brand" />
@@ -115,7 +115,7 @@ const BookingPanel = ({
         type="button"
         onClick={onConfirmBooking}
         disabled={!selectedSlotId || isBooking}
-        className="mt-auto w-full rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+        className="mt-auto w-full rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
       >
         {isBooking ? 'Booking...' : 'Confirm Booking'}
       </button>
