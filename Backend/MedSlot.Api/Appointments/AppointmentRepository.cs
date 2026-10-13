@@ -60,6 +60,10 @@ namespace MedSlot.Api.Appointments
             {
                 throw new InvalidOperationException("This slot was just booked by someone else. Please choose another slot.");
             }
+            catch (DbUpdateException)
+            {
+                throw new InvalidOperationException("This slot was just booked by someone else. Please choose another slot.");
+            }
 
             return new BookAppointmentResponse { AppointmentId = appointment.Id, StartTime = slot.StartTime, EndTime = slot.EndTime };
         }
