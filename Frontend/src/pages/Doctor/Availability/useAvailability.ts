@@ -18,6 +18,7 @@ const emptyDay = (dayOfWeek: DayOfWeek): DayAvailability => ({
 export const useAvailability = () => {
   const [days, setDays] = useState<DayAvailability[]>(DAY_ORDER.map(emptyDay))
   const [consultDurationMinutes, setConsultDurationMinutes] = useState<number | ''>('')
+  const [consultationFee, setConsultationFee] = useState<number | ''>('')
   const [isNewSetup, setIsNewSetup] = useState(true)
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
@@ -27,6 +28,10 @@ export const useAvailability = () => {
     if (res.consultDurationMinutes != null) {
       setIsNewSetup(false)
       setConsultDurationMinutes(res.consultDurationMinutes)
+    }
+    if(res.consultationFee != null){
+      setIsNewSetup(false)
+      setConsultationFee(res.consultationFee)
     }
     if (res.days?.length) {
       setDays(res.days)
@@ -81,7 +86,7 @@ export const useAvailability = () => {
         breakEndTime: toApiTime(d.breakEndTime),
       }))
 
-      await setDoctorAvailability({ days: payloadDays, consultDurationMinutes })
+      await setDoctorAvailability({ days: payloadDays, consultDurationMinutes, consultationFee })
       await loadAvailability()
       toast.success('Availability saved')
     } catch {
@@ -95,6 +100,8 @@ export const useAvailability = () => {
     days,
     consultDurationMinutes,
     setConsultDurationMinutes,
+    consultationFee,
+    setConsultationFee,
     isNewSetup,
     isLoading,
     isSaving,
