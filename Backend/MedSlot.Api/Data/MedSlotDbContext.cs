@@ -26,7 +26,15 @@ public partial class MedSlotDbContext : DbContext
 
     public virtual DbSet<Patient> Patients { get; set; }
 
+    public virtual DbSet<Payment> Payments { get; set; }
+
+    public virtual DbSet<PaymentAttempt> PaymentAttempts { get; set; }
+
+    public virtual DbSet<PaymentStatus> PaymentStatuses { get; set; }
+
     public virtual DbSet<Qualification> Qualifications { get; set; }
+
+    public virtual DbSet<Refund> Refunds { get; set; }
 
     public virtual DbSet<RegisteringCouncil> RegisteringCouncils { get; set; }
 
@@ -84,6 +92,7 @@ public partial class MedSlotDbContext : DbContext
             entity.HasIndex(e => e.UserId, "UQ_Doctors_UserId").IsUnique();
 
             entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.ConsultationFee).HasColumnType("decimal(10, 2)");
             entity.Property(e => e.FullName).HasMaxLength(150);
             entity.Property(e => e.Phone).HasMaxLength(20);
             entity.Property(e => e.RegistrationNumber).HasMaxLength(50);
@@ -142,12 +151,79 @@ public partial class MedSlotDbContext : DbContext
                 .HasConstraintName("FK_Patients_Users");
         });
 
+        modelBuilder.Entity<Payment>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Payments__3214EC07BB237745");
+
+            entity.HasIndex(e => e.AppointmentId, "UQ_Payments_AppointmentId").IsUnique();
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Amount).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.GatewayOrderId).HasMaxLength(100);
+
+            entity.HasOne(d => d.Appointment).WithOne(p => p.Payment)
+                .HasForeignKey<Payment>(d => d.AppointmentId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Payments_Appointments");
+
+            entity.HasOne(d => d.PaymentStatus).WithMany(p => p.Payments)
+                .HasForeignKey(d => d.PaymentStatusId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Payments_PaymentStatuses");
+        });
+
+        modelBuilder.Entity<PaymentAttempt>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__PaymentA__3214EC07CB444303");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.AttemptedAt).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.ErrorCode).HasMaxLength(50);
+            entity.Property(e => e.ErrorMessage).HasMaxLength(500);
+            entity.Property(e => e.GatewayPaymentId).HasMaxLength(100);
+
+            entity.HasOne(d => d.Payment).WithMany(p => p.PaymentAttempts)
+                .HasForeignKey(d => d.PaymentId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PaymentAttempts_Payments");
+
+            entity.HasOne(d => d.PaymentStatus).WithMany(p => p.PaymentAttempts)
+                .HasForeignKey(d => d.PaymentStatusId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PaymentAttempts_PaymentStatuses");
+        });
+
+        modelBuilder.Entity<PaymentStatus>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__PaymentS__3214EC071B534418");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.StatusName).HasMaxLength(50);
+        });
+
         modelBuilder.Entity<Qualification>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Qualific__3214EC07056BA31C");
 
             entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Name).HasMaxLength(150);
+        });
+
+        modelBuilder.Entity<Refund>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Refunds__3214EC07F5C127C6");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Amount).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.GatewayRefundId).HasMaxLength(100);
+            entity.Property(e => e.Reason).HasMaxLength(500);
+
+            entity.HasOne(d => d.Payment).WithMany(p => p.Refunds)
+                .HasForeignKey(d => d.PaymentId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Refunds_Payments");
         });
 
         modelBuilder.Entity<RegisteringCouncil>(entity =>

@@ -1,5 +1,6 @@
 ﻿using MedSlot.Api.Appointments.Dtos;
 using MedSlot.Api.Common;
+using MedSlot.Api.Payments;
 using Microsoft.EntityFrameworkCore;
 
 namespace MedSlot.Api.Appointments
@@ -7,11 +8,13 @@ namespace MedSlot.Api.Appointments
     public class AppointmentService: IAppointmentService
     {
         private IAppointmentRepository _appointmentRepository;
+        private IPaymentService _paymentService;
         private ICurrentUser _currentUser;
 
-        public AppointmentService(IAppointmentRepository appointmentRepository, ICurrentUser currentUser)
+        public AppointmentService(IAppointmentRepository appointmentRepository, ICurrentUser currentUser, IPaymentService paymentService)
         {
             _appointmentRepository = appointmentRepository;
+            _paymentService = paymentService;
             _currentUser = currentUser;
         }
 
@@ -25,8 +28,12 @@ namespace MedSlot.Api.Appointments
 
             var patientId = _currentUser.PatientId ?? throw new UnauthorizedAccessException();
 
-            var response = await _appointmentRepository.BookAppointmentAsync(patientId,request);
-            return response;
+            var bookingResponse = await _appointmentRepository.BookAppointmentAsync(patientId, request);
+
+            // Create Payment Record
+            var paymentResponse = await _paymentService.InitiatePaymentAsync(bookingResponse);
+
+            return bookingResponse;
         }
 
         public async Task<AppointmentSummaryResponse> GetMyAppointmentsAsync()

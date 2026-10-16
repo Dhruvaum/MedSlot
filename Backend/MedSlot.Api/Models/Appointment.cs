@@ -19,9 +19,13 @@ public partial class Appointment
 
     public string? PatientConcern { get; set; }
 
+    public DateTime? HoldExpiresAt { get; set; }
+
     public virtual AppointmentStatus AppointmentStatus { get; set; } = null!;
 
     public virtual Patient Patient { get; set; } = null!;
+
+    public virtual Payment? Payment { get; set; }
 
     public virtual TimeSlot TimeSlot { get; set; } = null!;
 }

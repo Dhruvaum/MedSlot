@@ -38,7 +38,7 @@ namespace MedSlot.Api.Appointments
 
             // Create new appointment Row
 
-            var appointmentStatusId = await _context.AppointmentStatuses.Where(status => status.StatusName == "Confirmed").Select(status => status.Id).FirstOrDefaultAsync();
+            var appointmentStatusId = await _context.AppointmentStatuses.Where(status => status.StatusName == "PendingPayment").Select(status => status.Id).FirstOrDefaultAsync();
 
             var appointment = new Appointment
             {
@@ -48,7 +48,8 @@ namespace MedSlot.Api.Appointments
                 AppointmentStatusId = appointmentStatusId,
                 BookedAt = DateTime.UtcNow,
                 CreatedAt = DateTime.UtcNow,
-                PatientConcern = request.PatientConcern
+                PatientConcern = request.PatientConcern,
+                HoldExpiresAt = DateTime.UtcNow.AddMinutes(10),
             };
 
             await _context.Appointments.AddAsync(appointment);
