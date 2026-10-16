@@ -64,7 +64,7 @@ So, it's always like:
 12. Doing schema compare is absolutely possible using EF Core, we run this command to scaffold the DB project using the connection string which ultimately gives us the dbcontext file and entities.
 
 ```
-dotnet ef dbcontext scaffold "Server=LAPTOP-4ORBUCUD\SQLEXPRESS;Database=MedSlot;Trusted_Connection=True;TrustServerCertificate=True;" Microsoft.EntityFrameworkCore.SqlServer -o Models -c MedSlotDbContext --context-dir Data --force
+dotnet ef dbcontext scaffold "Server=LAPTOP-4ORBUCUD\SQLEXPRESS;Database=MedSlot;Trusted_Connection=True;TrustServerCertificate=True;" Microsoft.EntityFrameworkCore.SqlServer -o Models -c MedSlotDbContext --context-dir Data --schema dbo --force
 ```
 
 Here, `-o` = --output-dir — where the generated entity classes go (Models, in my case).
