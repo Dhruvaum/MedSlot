@@ -28,6 +28,7 @@ export interface DoctorSummaryResponse{
     fullName: string,
     specializationName: string | null,
     qualificationName: string | null,
+    consultationFee: number | null
     workAddress: string
 }
 
@@ -52,5 +53,6 @@ export interface DayAvailability{
 
 export interface DoctorAvailability{
     days: DayAvailability[],
-    consultDurationMinutes: number
+    consultDurationMinutes: number,
+    consultationFee: number
 }
