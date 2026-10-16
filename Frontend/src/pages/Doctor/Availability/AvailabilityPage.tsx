@@ -8,6 +8,8 @@ const AvailabilityPage = () => {
     days,
     consultDurationMinutes,
     setConsultDurationMinutes,
+    consultationFee,
+    setConsultationFee,
     isNewSetup,
     isLoading,
     isSaving,
@@ -40,20 +42,39 @@ const AvailabilityPage = () => {
           </div>
         )}
 
-        <div className="mt-8 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
-          <label className="text-sm font-medium text-slate-700">Consultation Duration</label>
-          <p className="mt-1 text-xs text-slate-400">How long each appointment slot should be.</p>
-          <div className="mt-2 flex items-center gap-2">
-            <input
-              type="number"
-              min={5}
-              step={5}
-              value={consultDurationMinutes}
-              onChange={(e) => setConsultDurationMinutes(e.target.value ? Number(e.target.value) : '')}
-              className="w-28 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-800 outline-none transition focus:border-brand"
-              placeholder="20"
-            />
-            <span className="text-sm text-slate-500">minutes</span>
+        <div className="mt-8 flex flex-col gap-6 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm sm:flex-row sm:gap-10">
+          <div>
+            <label className="text-sm font-medium text-slate-700">Consultation Duration</label>
+            <p className="mt-1 text-xs text-slate-400">How long each appointment slot should be.</p>
+            <div className="mt-2 flex items-center gap-2">
+              <input
+                type="number"
+                min={5}
+                step={5}
+                value={consultDurationMinutes}
+                onChange={(e) => setConsultDurationMinutes(e.target.value ? Number(e.target.value) : '')}
+                className="w-28 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-800 outline-none transition focus:border-brand"
+                placeholder="20"
+              />
+              <span className="text-sm text-slate-500">minutes</span>
+            </div>
+          </div>
+
+          <div>
+            <label className="text-sm font-medium text-slate-700">Consultation Fee</label>
+            <p className="mt-1 text-xs text-slate-400">What patients pay per appointment.</p>
+            <div className="mt-2 flex items-center gap-2">
+              <span className="text-sm text-slate-500">₹</span>
+              <input
+                type="number"
+                min={0}
+                step={1}
+                value={consultationFee}
+                onChange={(e) => setConsultationFee(e.target.value ? Number(e.target.value) : '')}
+                className="w-28 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-800 outline-none transition focus:border-brand"
+                placeholder="500"
+              />
+            </div>
           </div>
         </div>
 

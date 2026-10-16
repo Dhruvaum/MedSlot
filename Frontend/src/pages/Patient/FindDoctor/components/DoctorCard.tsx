@@ -1,4 +1,4 @@
-import { Stethoscope, MapPin, GraduationCap } from 'lucide-react'
+import { Stethoscope, MapPin, GraduationCap, IndianRupee } from 'lucide-react'
 import type { DoctorSummaryResponse } from '../../../../features/doctor/types'
 
 interface DoctorCardProps {
@@ -39,6 +39,12 @@ const DoctorCard = ({ doctor, isSelected, isBooking, onViewDetail, onBookNow }: 
           <MapPin size={16} className="shrink-0 text-slate-400" />
           <span className="line-clamp-1">{doctor.workAddress}</span>
         </div>
+        {doctor.consultationFee != null && (
+          <div className="flex items-center gap-2">
+            <IndianRupee size={16} className="shrink-0 text-slate-400" />
+            <span>{doctor.consultationFee} per consultation</span>
+          </div>
+        )}
       </div>
 
       <div className="flex gap-2 pt-1">
