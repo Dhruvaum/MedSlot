@@ -65,7 +65,6 @@ So, it's always like:
 
 ```
 dotnet ef dbcontext scaffold "Server=LAPTOP-4ORBUCUD\SQLEXPRESS;Database=MedSlot;Trusted_Connection=True;TrustServerCertificate=True;" Microsoft.EntityFrameworkCore.SqlServer -o Models -c MedSlotDbContext --context-dir Data --schema dbo --force
-lso
 ```
 
 Here, `-o` = --output-dir — where the generated entity classes go (Models, in my case).
