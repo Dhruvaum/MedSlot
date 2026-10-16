@@ -27,6 +27,8 @@ public partial class Doctor
 
     public Guid? RegisteringCouncilId { get; set; }
 
+    public decimal? ConsultationFee { get; set; }
+
     public virtual ICollection<DoctorAvailability> DoctorAvailabilities { get; set; } = new List<DoctorAvailability>();
 
     public virtual Qualification Qualification { get; set; } = null!;

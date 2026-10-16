@@ -78,6 +78,7 @@ namespace MedSlot.Api.Doctors
                 FullName = d.FullName,
                 SpecializationName = d.Specialization?.Name,
                 QualificationName = d.Qualification?.Name,
+                ConsultationFee = d.ConsultationFee,
                 WorkAddress = d.WorkAddress
             }).ToList();
 
@@ -127,7 +128,8 @@ namespace MedSlot.Api.Doctors
         public async Task SetAvailabilityAsync(SetDoctorAvailabilityRequest request)
         {
             if (request.ConsultDurationMinutes <= 0) throw new DbUpdateException("Consultation Time is required to Proceed");
-            
+            if (request.ConsultationFee <= 0) throw new DbUpdateException("Consultation Fee is required to Proceed");
+
             Guid doctorId = _currentUser.DoctorId ?? throw new UnauthorizedAccessException();
             
             // Map DayAvailability request to DoctorAvailability
@@ -172,13 +174,13 @@ namespace MedSlot.Api.Doctors
                 }
             }
 
-            await _doctorRepository.SetAvailabilityAsync(doctorId, request.ConsultDurationMinutes, availabilities);
+            await _doctorRepository.SetAvailabilityAsync(doctorId, request.ConsultDurationMinutes, request.ConsultationFee , availabilities);
         }
         public async Task<DoctorAvailabilityResponse> GetAvailabilityAsync()
         {
             Guid doctorId = _currentUser.DoctorId ?? throw new UnauthorizedAccessException();
 
-            var (availabilities, consultDurationMinutes) = await _doctorRepository.GetAvailabilityByDoctorIdAsync(doctorId);
+            var (availabilities, consultDurationMinutes, ConsultationFee) = await _doctorRepository.GetAvailabilityByDoctorIdAsync(doctorId);
 
             var days = new List<DayAvailability>();
 
@@ -217,7 +219,7 @@ namespace MedSlot.Api.Doctors
                 }
             }
 
-            return new DoctorAvailabilityResponse { Days = days, ConsultDurationMinutes = consultDurationMinutes };
+            return new DoctorAvailabilityResponse { Days = days, ConsultDurationMinutes = consultDurationMinutes , ConsultationFee = ConsultationFee};
         }
 
     }

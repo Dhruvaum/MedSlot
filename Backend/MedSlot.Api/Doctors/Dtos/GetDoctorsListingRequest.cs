@@ -8,6 +8,7 @@
         public int? Rating { get; set; }
         public int? TotalPatientsDiagnosed { get; set; }
         public int? YearsOfExperience { get; set; }
+        public decimal? consultationFee { get; set; }
         public string? State { get; set; }
         public string? City { get; set; }
         public int PageNumber { get; set; } = 1;

@@ -27,7 +27,7 @@ namespace MedSlot.Api.Appointments.TimeSlots
 
             foreach (var doctor in doctors)
             {
-                var (availabilities, consultDurationMinutes) = await _doctorRepository.GetAvailabilityByDoctorIdAsync(doctor.Id);
+                var (availabilities, consultDurationMinutes, consultationFee) = await _doctorRepository.GetAvailabilityByDoctorIdAsync(doctor.Id);
 
                 if (availabilities == null || !availabilities.Any()) continue;
                 if (consultDurationMinutes is null) continue;

@@ -76,6 +76,10 @@ namespace MedSlot.Api.Doctors
             {
                 query = query.Where(d => d.QualificationId == request.QualificationId);
             }
+            if(request.consultationFee is not null)
+            {
+                query = query.Where(d => d.ConsultationFee == request.consultationFee);
+            }
 
             // Get Total count
 
@@ -101,7 +105,7 @@ namespace MedSlot.Api.Doctors
             return doctor;
         }
 
-        public async Task SetAvailabilityAsync(Guid doctorId, int consultDurationMinutes, List<DoctorAvailability> newRows)
+        public async Task SetAvailabilityAsync(Guid doctorId, int consultDurationMinutes, decimal consultationFee, List<DoctorAvailability> newRows)
         {
             var existingRows = await _context.DoctorAvailabilities
                 .Where(a => a.DoctorId == doctorId)
@@ -112,17 +116,18 @@ namespace MedSlot.Api.Doctors
             // Set ConsultaionTime
             var doctor = await _context.Doctors.FirstOrDefaultAsync(d => d.Id == doctorId);
             doctor.ConsultDurationMinutes = consultDurationMinutes;
+            doctor.ConsultationFee = consultationFee;
 
             await _context.DoctorAvailabilities.AddRangeAsync(newRows);
             await _context.SaveChangesAsync();
         }
 
-        public async Task<(List<DoctorAvailability> availabilities, int? ConsultDurationMinutes)> GetAvailabilityByDoctorIdAsync(Guid doctorId)
+        public async Task<(List<DoctorAvailability> availabilities, int? ConsultDurationMinutes, decimal? ConsultationFee)> GetAvailabilityByDoctorIdAsync(Guid doctorId)
         {
             var availabilities = await _context.DoctorAvailabilities.Where(a => a.DoctorId == doctorId).ToListAsync();
             Doctor doctor = await _context.Doctors.FirstOrDefaultAsync(d => d.Id == doctorId);
 
-            return (availabilities, doctor?.ConsultDurationMinutes);
+            return (availabilities, doctor?.ConsultDurationMinutes, doctor?.ConsultationFee);
         }
     }
 }
