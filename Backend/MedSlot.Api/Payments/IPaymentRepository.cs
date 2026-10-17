@@ -6,6 +6,7 @@ namespace MedSlot.Api.Payments
     public interface IPaymentRepository
     {
         Task<Doctor> GetDoctorByAppoinmentIdAsync(Guid appointmentId);
-        Task CreatePaymentRowAsync(BookAppointmentResponse appointmentResponse, Doctor doctor);
+        Task CreatePaymentRowAsync(BookAppointmentResponse appointmentResponse, Doctor doctor, string orderId);
+        Task MarkPaymentCaptured(string orderId, string paymentId);
     }
 }

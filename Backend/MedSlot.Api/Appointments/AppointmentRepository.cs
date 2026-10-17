@@ -46,7 +46,6 @@ namespace MedSlot.Api.Appointments
                 TimeSlotId = slotId,
                 PatientId = patientId,
                 AppointmentStatusId = appointmentStatusId,
-                BookedAt = DateTime.UtcNow,
                 CreatedAt = DateTime.UtcNow,
                 PatientConcern = request.PatientConcern,
                 HoldExpiresAt = DateTime.UtcNow.AddMinutes(10),

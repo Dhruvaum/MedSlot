@@ -31,7 +31,11 @@ namespace MedSlot.Api.Appointments
             var bookingResponse = await _appointmentRepository.BookAppointmentAsync(patientId, request);
 
             // Create Payment Record
-            var paymentResponse = await _paymentService.InitiatePaymentAsync(bookingResponse);
+            var paymentInfo = await _paymentService.InitiatePaymentAsync(bookingResponse);
+
+            bookingResponse.RazorpayOrderId = paymentInfo.RazorpayOrderId;
+            bookingResponse.Amount = paymentInfo.Amount;
+            bookingResponse.RazorpayKeyId = paymentInfo.RazorpayKeyId;
 
             return bookingResponse;
         }

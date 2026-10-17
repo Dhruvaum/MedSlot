@@ -25,7 +25,7 @@ namespace MedSlot.Api.Payments
             return doctor;
         }
         
-        public async Task CreatePaymentRowAsync(BookAppointmentResponse appointmentResponse, Doctor doctor)
+        public async Task CreatePaymentRowAsync(BookAppointmentResponse appointmentResponse, Doctor doctor, string orderId)
         {
             var newPaymentStatusId = await _context.PaymentStatuses
                 .Where(ps => ps.StatusName == "Created")
@@ -40,10 +40,37 @@ namespace MedSlot.Api.Payments
                 AppointmentId = appointmentResponse.AppointmentId,
                 Amount = doctor.ConsultationFee!.Value,
                 PaymentStatusId = newPaymentStatusId,
+                GatewayOrderId = orderId,
                 CreatedAt = DateTime.UtcNow,
             };
 
             await _context.Payments.AddAsync(paymentRow);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task MarkPaymentCaptured(string orderId, string paymentId)
+        {
+            var paymentRow = await _context.Payments.Where(p => p.GatewayOrderId == orderId).FirstOrDefaultAsync();
+            var capturedPaymentStatusId = await _context.PaymentStatuses.Where(ps => ps.StatusName == "Captured").Select(ps => ps.Id).FirstOrDefaultAsync();
+
+            var paymentAttempt = new PaymentAttempt
+            {
+                Id = Guid.NewGuid(),
+                PaymentId = paymentRow.Id,
+                GatewayPaymentId = paymentId,
+                PaymentStatusId = capturedPaymentStatusId,
+                AttemptedAt = DateTime.UtcNow
+            };
+
+            var appointment = await _context.Payments.Where(p => p.Id == paymentRow.Id).Select(p => p.Appointment).FirstOrDefaultAsync();
+            var appointmentStatusId = await _context.AppointmentStatuses.Where(ast => ast.StatusName == "Confirmed").Select(ast => ast.Id).FirstOrDefaultAsync();
+
+            await _context.PaymentAttempts.AddAsync(paymentAttempt);
+            paymentRow.PaymentStatusId = capturedPaymentStatusId;
+            appointment.AppointmentStatusId = appointmentStatusId;
+            appointment.BookedAt = DateTime.UtcNow;
+            appointment.HoldExpiresAt = null;
+
             await _context.SaveChangesAsync();
         }
     }
