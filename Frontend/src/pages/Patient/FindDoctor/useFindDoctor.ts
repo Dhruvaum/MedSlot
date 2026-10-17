@@ -3,8 +3,9 @@ import { toast } from 'sonner'
 import { getDoctorsListing } from '../../../features/doctor/doctorService'
 import { ViewDoctorProfile } from '../../../features/doctor/doctorService'
 import type { DoctorSummaryResponse, ViewDoctorProfileResponse } from '../../../features/doctor/types'
-import { getAvailableSlots, bookAppointment } from '../../../features/appointment/appointmentService'
+import { getAvailableSlots, bookAppointment, verifyPayment } from '../../../features/appointment/appointmentService'
 import type { AvailableSlot } from '../../../features/appointment/types'
+import { loadRazorpayScript } from '@/lib/loadRazorpayScript'
 
 const PAGE_SIZE = 9
 
@@ -104,22 +105,59 @@ export const useFindDoctor = () => {
 
     setIsBooking(true)
     try {
-      await bookAppointment({ timeSlotId: selectedSlotId, patientConcern: patientConcern || undefined })
-      toast.success('Appointment booked successfully')
+      const booking = await bookAppointment({ timeSlotId: selectedSlotId, patientConcern: patientConcern || undefined })
 
-      // Reset booking panel, refresh slots for this doctor (the booked one is now gone)
-      setSelectedSlotId(null)
-      setPatientConcern('')
-      if (bookingDoctorId) {
-        getAvailableSlots(bookingDoctorId).then((response) => setAvailableSlots(response))
+      const scriptLoaded = await loadRazorpayScript();
+      if(!scriptLoaded){
+        toast.error('Could not load payment gateway. Please try again');
+        setIsBooking(false);
+        return;
       }
-    } catch {
+
+      const options = {
+        key: booking.razorpayKeyId,
+        amount: Math.round(booking.amount * 100),
+        currency: 'INR',
+        name: 'MedSlot',
+        description: 'ConsultationFee',
+        order_id: booking.razorpayOrderId,
+        handler: async (response: any) => {
+          try{
+            await verifyPayment({
+              razorpayOrderId: response.razorpay_order_id,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpaySignature: response.razorpay_signature
+            });
+
+            toast.success('Appointment booked and payment confirmed')
+            setSelectedSlotId(null);
+            setPatientConcern('');
+            if(bookingDoctorId) getAvailableSlots(bookingDoctorId).then((res) => setAvailableSlots(res))
+          }
+          catch {
+            toast.error('Payment succeeded by confirmation failed')
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            toast.info('Payment not completed - your slot will expire automatically if unpaid');
+          }
+        }
+      }
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+    }
+
+    catch {
       toast.error('This slot was just booked by someone else — pick another one')
       if (bookingDoctorId) {
         getAvailableSlots(bookingDoctorId).then((response) => setAvailableSlots(response))
       }
       setSelectedSlotId(null)
-    } finally {
+    }
+    
+    finally {
       setIsBooking(false)
     }
   }
