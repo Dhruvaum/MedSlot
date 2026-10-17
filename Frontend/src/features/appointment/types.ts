@@ -12,7 +12,16 @@ export interface BookAppointmentRequest {
 export interface BookAppointmentResponse {
     appointmentId: string,
     startTime: string,
-    endTime: string
+    endTime: string,
+    razorpayOrderId: string,
+    amount: number,
+    razorpayKeyId: string
+}
+
+export interface VerifyPaymentRequest {
+    razorpayPaymentId: string,
+    razorpayOrderId: string,
+    razorpaySignature: string
 }
 
 export interface AppointmentSummary{
