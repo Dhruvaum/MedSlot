@@ -3,9 +3,9 @@ import { toast } from 'sonner'
 import { getDoctorsListing } from '../../../features/doctor/doctorService'
 import { ViewDoctorProfile } from '../../../features/doctor/doctorService'
 import type { DoctorSummaryResponse, ViewDoctorProfileResponse } from '../../../features/doctor/types'
-import { getAvailableSlots, bookAppointment, verifyPayment } from '../../../features/appointment/appointmentService'
+import { getAvailableSlots, bookAppointment } from '../../../features/appointment/appointmentService'
 import type { AvailableSlot } from '../../../features/appointment/types'
-import { loadRazorpayScript } from '@/lib/loadRazorpayScript'
+import { openRazorpayCheckout } from '@/lib/openRazorpayCheckout'
 
 const PAGE_SIZE = 9
 
@@ -107,46 +107,21 @@ export const useFindDoctor = () => {
     try {
       const booking = await bookAppointment({ timeSlotId: selectedSlotId, patientConcern: patientConcern || undefined })
 
-      const scriptLoaded = await loadRazorpayScript();
-      if(!scriptLoaded){
-        toast.error('Could not load payment gateway. Please try again');
-        setIsBooking(false);
-        return;
-      }
-
-      const options = {
-        key: booking.razorpayKeyId,
-        amount: Math.round(booking.amount * 100),
-        currency: 'INR',
-        name: 'MedSlot',
-        description: 'ConsultationFee',
-        order_id: booking.razorpayOrderId,
-        handler: async (response: any) => {
-          try{
-            await verifyPayment({
-              razorpayOrderId: response.razorpay_order_id,
-              razorpayPaymentId: response.razorpay_payment_id,
-              razorpaySignature: response.razorpay_signature
-            });
-
-            toast.success('Appointment booked and payment confirmed')
-            setSelectedSlotId(null);
-            setPatientConcern('');
-            if(bookingDoctorId) getAvailableSlots(bookingDoctorId).then((res) => setAvailableSlots(res))
-          }
-          catch {
-            toast.error('Payment succeeded by confirmation failed')
-          }
+      await openRazorpayCheckout({
+        razorpayKeyId: booking.razorpayKeyId,
+        razorpayOrderId: booking.razorpayOrderId,
+        amount: booking.amount,
+        expiresInMs: 10 * 60 * 1000,
+        onSuccess: () => {
+          toast.success('Appointment booked and payment confirmed')
+          setSelectedSlotId(null)
+          setPatientConcern('')
+          if (bookingDoctorId) getAvailableSlots(bookingDoctorId).then((res) => setAvailableSlots(res))
         },
-        modal: {
-          ondismiss: () => {
-            toast.info('Payment not completed - your slot will expire automatically if unpaid');
-          }
-        }
-      }
-
-      const razorpay = new window.Razorpay(options);
-      razorpay.open();
+        onFailure: (message) => toast.error(message),
+        onDismiss: () => toast.info('Payment not completed - your slot will expire automatically if unpaid'),
+        onExpire: () => toast.error('Your booking session has expired. Please try again.'),
+      })
     }
 
     catch {

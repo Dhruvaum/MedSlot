@@ -33,7 +33,8 @@ export interface AppointmentSummary{
     status: string,
     bookedAt: string,
     createdAt: string,
-    concern?: string
+    concern?: string,
+    holdExpiresAt: string | null
 }
 
 export interface AppointmentSummaryResponse{
