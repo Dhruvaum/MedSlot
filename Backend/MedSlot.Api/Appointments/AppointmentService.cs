@@ -65,13 +65,19 @@ namespace MedSlot.Api.Appointments
                     Status = ast.StatusName,
                     BookedAt = a.BookedAt,
                     CreatedAt = a.CreatedAt,
-                    Concern = a.PatientConcern
+                    Concern = a.PatientConcern,
+                    HoldExpiresAt = a.HoldExpiresAt
                 };
 
                 mappedAppointments.Add(mappedAppointment);
             }
 
             return new AppointmentSummaryResponse { Appointments = mappedAppointments };
+        }
+
+        public async Task ReleaseUnpaidAppointmentsAsync()
+        {
+            await _appointmentRepository.ReleaseUnpaidAppointmentsAsync();
         }
     }
 }

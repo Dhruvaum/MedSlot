@@ -76,9 +76,44 @@ namespace MedSlot.Api.Appointments
                                      .ThenInclude(ts => ts.Doctor)
                                      .ThenInclude(d => d.Specialization)
                                      .Include(a => a.AppointmentStatus)
+                                     .OrderByDescending(a => a.CreatedAt)
                                      .ToListAsync();
 
             return appointments;
+        }
+
+        public async Task ReleaseUnpaidAppointmentsAsync()
+        {
+            // Get Stauses
+            var failedAppointmentStatusId = await _context.AppointmentStatuses
+                .Where(ast => ast.StatusName == "PaymentFailed")
+                .Select(ast => ast.Id)
+                .FirstOrDefaultAsync();
+
+            var failedPaymentStatusId = await _context.PaymentStatuses
+                .Where(ps => ps.StatusName == "Failed")
+                .Select(ps => ps.Id)
+                .FirstOrDefaultAsync();
+            
+            // Get Hold Expired Appointments
+            var staleAppointments = await _context.Appointments
+                .Include(a => a.TimeSlot)
+                .Include(a => a.Payment)
+                .Where(a => a.HoldExpiresAt <= DateTime.UtcNow)
+                .ToListAsync();
+
+            // Mark Payment Rows as "Failed"
+            foreach(var sa in staleAppointments)
+            {
+                sa.Payment.PaymentStatusId = failedPaymentStatusId;
+                sa.AppointmentStatusId = failedAppointmentStatusId;
+                sa.HoldExpiresAt = null;
+                sa.TimeSlot.IsBooked = false;
+            };
+
+            // Save changes
+
+            await _context.SaveChangesAsync();
         }
     }
 }

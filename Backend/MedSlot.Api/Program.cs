@@ -83,15 +83,22 @@ using (var scope = app.Services.CreateScope())
         job => job.RunAsync(),
         "30 20 * * *"
     );
+
+    recurringJobManager.AddOrUpdate<ReleaseUnpaidAppointmentsJob>(
+        "release-stale-appointments",
+        job => job.RunAsync(),
+        "*/2 * * * *"
+    );
 }
 
-    // Configure the HTTP request pipeline.
-    if (app.Environment.IsDevelopment())
-    {
-        app.UseSwagger();
-        app.UseSwaggerUI();
-        app.UseHangfireDashboard("/hangfire");
-    }
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+    app.UseHangfireDashboard("/hangfire");
+}
+
 app.UseExceptionHandler();
 
 app.UseHttpsRedirection();

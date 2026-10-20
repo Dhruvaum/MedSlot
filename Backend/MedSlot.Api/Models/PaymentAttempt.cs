@@ -19,6 +19,8 @@ public partial class PaymentAttempt
 
     public DateTime AttemptedAt { get; set; }
 
+    public string? ReferenceNumber { get; set; }
+
     public virtual Payment Payment { get; set; } = null!;
 
     public virtual PaymentStatus PaymentStatus { get; set; } = null!;

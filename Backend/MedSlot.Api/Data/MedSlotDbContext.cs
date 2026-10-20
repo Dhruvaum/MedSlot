@@ -55,8 +55,6 @@ public partial class MedSlotDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Appointm__3214EC07764AC0A2");
 
-            entity.HasIndex(e => e.TimeSlotId, "UQ_Appointments_TimeSlotId").IsUnique();
-
             entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
             entity.Property(e => e.PatientConcern).HasMaxLength(500);
@@ -71,8 +69,8 @@ public partial class MedSlotDbContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Appointments_Patients");
 
-            entity.HasOne(d => d.TimeSlot).WithOne(p => p.Appointment)
-                .HasForeignKey<Appointment>(d => d.TimeSlotId)
+            entity.HasOne(d => d.TimeSlot).WithMany(p => p.Appointments)
+                .HasForeignKey(d => d.TimeSlotId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Appointments_TimeSlots");
         });
@@ -182,6 +180,7 @@ public partial class MedSlotDbContext : DbContext
             entity.Property(e => e.ErrorCode).HasMaxLength(50);
             entity.Property(e => e.ErrorMessage).HasMaxLength(500);
             entity.Property(e => e.GatewayPaymentId).HasMaxLength(100);
+            entity.Property(e => e.ReferenceNumber).HasMaxLength(100);
 
             entity.HasOne(d => d.Payment).WithMany(p => p.PaymentAttempts)
                 .HasForeignKey(d => d.PaymentId)

@@ -1,4 +1,5 @@
 ﻿using MedSlot.Api.Appointments.Dtos;
+using MedSlot.Api.Common.Dtos;
 using MedSlot.Api.Payments.Dtos;
 
 namespace MedSlot.Api.Payments
@@ -7,5 +8,8 @@ namespace MedSlot.Api.Payments
     {
         Task<InitiatePaymentResponse> InitiatePaymentAsync(BookAppointmentResponse appointment);
         Task VerifyPaymentAsync(VerifyPaymentRequest request);
+        Task<ResumeBookingPaymentResponse> ResumeBookingPaymentAsync(Guid appointmentId);
+        Task<PagedResponse<TransactionSummaryResponse>> GetPatientTransactionsListingAsync(GetTransactionsListingRequest request);
+        Task<List<PaymentStatusOptionResponse>> GetPaymentStatusOptionsAsync();
     }
 }
