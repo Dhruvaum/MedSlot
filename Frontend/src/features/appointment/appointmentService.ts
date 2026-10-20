@@ -18,6 +18,8 @@ export const verifyPayment = async (Request: VerifyPaymentRequest): Promise<void
     await axiosClient.post('/payments/verifyPayment', Request);
 }
 
+
+
 export const getMyAppointments = async (): Promise<AppointmentSummaryResponse> => {
     const response = await axiosClient.get<AppointmentSummaryResponse>('/patient-appointment/getMyAppointments');
     return response.data;
