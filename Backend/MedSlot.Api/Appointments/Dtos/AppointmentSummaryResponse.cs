@@ -16,5 +16,6 @@
         public DateTime BookedAt { get; set; }
         public DateTime CreatedAt { get; set; }
         public string? Concern { get; set; }
+        public DateTime? HoldExpiresAt { get; set; }
     }
 }

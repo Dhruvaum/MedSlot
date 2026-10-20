@@ -6,5 +6,6 @@ namespace MedSlot.Api.Appointments
     {
         Task<BookAppointmentResponse> BookAppointmentAsync(BookAppointmentRequest request);
         Task<AppointmentSummaryResponse> GetMyAppointmentsAsync();
+        Task ReleaseUnpaidAppointmentsAsync();
     }
 }

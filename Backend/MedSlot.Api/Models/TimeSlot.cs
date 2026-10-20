@@ -19,7 +19,7 @@ public partial class TimeSlot
 
     public DateTime CreatedAt { get; set; }
 
-    public virtual Appointment? Appointment { get; set; }
+    public virtual ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
 
     public virtual Doctor Doctor { get; set; } = null!;
 }
