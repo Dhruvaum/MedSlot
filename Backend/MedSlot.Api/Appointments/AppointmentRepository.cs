@@ -82,6 +82,56 @@ namespace MedSlot.Api.Appointments
             return appointments;
         }
 
+        public async Task<string> DetermineCancellationCaseAsync(Guid patientId, Guid appointmentId)
+        {
+            // Rules:
+            // Case 1: Cancel without Refund => [Appointment Status = PendingPayment, PaymentStatus = Created]
+            // Case 2: Cancel with Refund => [Appointment Status = Confirmed, PaymentStatus = Captured]
+            
+            bool validated = false;
+
+            var appointment = await _context.Appointments
+                .Include(a => a.TimeSlot)
+                .Include(a => a.Payment)
+                .Where(a => a.Id == appointmentId && a.PatientId == patientId)
+                .FirstOrDefaultAsync();
+
+            if (appointment is not null) validated = true;
+
+            if (validated == false) throw new InvalidOperationException();
+
+            // Check Status to determine case --
+
+            var appointmentStatusName = appointment.AppointmentStatus.StatusName;
+            var paymentStatusName = appointment.Payment.PaymentStatus.StatusName;
+
+            if (appointmentStatusName == "PendingPayment" && paymentStatusName == "Created") return "JustCancelNoRefund";
+            else if (appointmentStatusName == "Confirmed" && paymentStatusName == "Captured") return "InitiateRefundAndCancel";
+
+            return null;
+        }
+
+        public async Task<CancelAppointmentResponse> InitiateNoRefundAppointmentCansellation(Guid patientId, Guid appointmentId, bool? confirmCancel)
+        {
+            var appointment = await _context.Appointments
+                .Include(a => a.TimeSlot)
+                .Include(a => a.Payment)
+                .Where(a => a.Id == appointmentId)
+                .FirstOrDefaultAsync();
+
+            var cancelledAppointmentStatusId = await _context.AppointmentStatuses.Where(a => a.StatusName == "Cancelled").Select(a => a.Id).FirstOrDefaultAsync();
+            var failedPaymentStatusId = await _context.PaymentStatuses.Where(ps => ps.StatusName == "Failed").Select(ps => ps.Id).FirstOrDefaultAsync();
+
+            appointment.Payment.PaymentStatusId = failedPaymentStatusId;
+            appointment.AppointmentStatusId = cancelledAppointmentStatusId;
+            appointment.HoldExpiresAt = null;
+            appointment.TimeSlot.IsBooked = false;
+
+            await _context.SaveChangesAsync();
+
+            return new CancelAppointmentResponse { StatusCode = 200, Message = "Appointment Cancelled Successfully" };
+        }
+
         public async Task ReleaseUnpaidAppointmentsAsync()
         {
             // Get Stauses

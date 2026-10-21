@@ -40,5 +40,12 @@ namespace MedSlot.Api.Appointments
             var response = await _appointmentService.GetMyAppointmentsAsync();
             return Ok(response);
         }
+
+        [HttpGet("cancelAppointment")]
+        public async Task<ActionResult<CancelAppointmentResponse>> CancelAppointment([FromQuery] Guid appointmentId, Boolean? confirmCancel = false)
+        {
+            var response = await _appointmentService.CancelAppointmentAsync(appointmentId, confirmCancel);
+            return Ok(response);
+        }
     }
 }

@@ -8,15 +8,14 @@ To provide the fastest, most convenient way for a patient to find and book a doc
 
 ## Features
 
-- Escrow-style payment — funds held by the platform, released after service confirmation
-- Concurrency-safe appointment booking — no double-booked slots
-- Time-bound payment hold with auto-cancel if unpaid within the window
-- Payments and refunds tracked as separate, auditable records
-- Doctor verification during registration
-- Multiple search filters for fast, convenient booking
-- Separate patient-facing and doctor-facing interfaces
+- Concurrency-safe appointment booking, proven under genuine simultaneous load with an automated stress test — not just assumed safe, actually verified
+- Real payment gateway integration (Razorpay) with server-side cryptographic signature verification — a payment is never trusted on the client's word alone
+- Time-bound payment hold with automatic release if unpaid within the window, enforced by a background job rather than a one-off check
+- Every payment attempt recorded as its own auditable record, including the gateway's own transaction reference number — not collapsed into a single pass/fail flag
+- Resume-payment support — a patient can pick up a still-valid, unfinished checkout instead of losing their held slot
+- Separate patient-facing and doctor-facing interfaces, each with their own dashboard
 
-**Planned for a later version**: in-range/distance-based doctor search.
+**Coming next**: appointment cancellation with tiered refunds, doctor verification during registration, additional search filters (specialty/qualification), and in-range/distance-based doctor search.
 
 ## Tech Stack
 
@@ -54,7 +53,7 @@ npm run dev
 
 ## Project Status
 
-Actively in development. Patient registration, authentication, and profile management are live. Patients can search, filter, and browse verified doctors by name and specialty. Appointment booking and payments are the current focus — see [ROADMAP.md](./ROADMAP.md) for detailed progress.
+Actively in development. Patient registration, authentication, and profile management are live. Patients can search and book verified doctors, with concurrency-safe slot locking and a full Razorpay payment flow — including signature-verified confirmation and automatic release of unpaid holds. Appointment cancellation/refunds and doctor verification are the current focus — see [ROADMAP.md](./ROADMAP.md) for detailed progress.
 
 ## License
 

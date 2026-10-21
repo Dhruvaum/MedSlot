@@ -75,6 +75,33 @@ namespace MedSlot.Api.Appointments
             return new AppointmentSummaryResponse { Appointments = mappedAppointments };
         }
 
+        public async Task<CancelAppointmentResponse> CancelAppointmentAsync(Guid appointmentId, Boolean? confirmCancel)
+        {
+            var patientId = _currentUser.PatientId ?? throw new UnauthorizedAccessException();
+
+            string determinedCase = await _appointmentRepository.DetermineCancellationCaseAsync(patientId, appointmentId);
+
+            if (determinedCase == null)
+                return new CancelAppointmentResponse { StatusCode = 500, Message = "An enexpected error occured" };
+
+            if(determinedCase == "JustCancelNoRefund")
+                return await _appointmentRepository.InitiateNoRefundAppointmentCansellation(patientId, appointmentId, confirmCancel);
+
+            else if(determinedCase == "InitiateRefundAndCancel")
+                return await InitiateAppointmentCancellationWithRefund(patientId, appointmentId, confirmCancel);
+
+            return new CancelAppointmentResponse { StatusCode = 500, Message = "Could not proceed with the request. Please try again later"};
+        }
+
+        private async Task<CancelAppointmentResponse> InitiateAppointmentCancellationWithRefund(Guid patientid, Guid appointmentId, bool? confirmCancel)
+        {
+            if (confirmCancel != true)
+                return new CancelAppointmentResponse { StatusCode = 400, Message = "Confirmation Required. Please confirm once to proceed" };
+
+            // TODO: refund logic (tier calc + Razorpay refund call) - not yet implemented
+            return new CancelAppointmentResponse { StatusCode = 501, Message = "Cancellation with refund is not yet supported." };
+        }
+
         public async Task ReleaseUnpaidAppointmentsAsync()
         {
             await _appointmentRepository.ReleaseUnpaidAppointmentsAsync();
