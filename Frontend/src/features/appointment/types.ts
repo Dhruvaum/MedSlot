@@ -34,9 +34,17 @@ export interface AppointmentSummary{
     bookedAt: string,
     createdAt: string,
     concern?: string,
-    holdExpiresAt: string | null
+    holdExpiresAt: string | null,
+    cancellable: boolean
 }
 
 export interface AppointmentSummaryResponse{
     appointments: AppointmentSummary[]
+}
+
+export interface CancelAppointmentResponse{
+    statusCode: number,
+    message: string,
+    confirmationRequired: boolean | null,
+    case: string | null
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { getMyAppointments } from '../../../features/appointment/appointmentService'
+import { getMyAppointments, cancelAppointment } from '../../../features/appointment/appointmentService'
 import { resumeBookingPayment } from '../../../features/payment/paymentService'
 import type { AppointmentSummary } from '../../../features/appointment/types'
 import { openRazorpayCheckout } from '../../../lib/openRazorpayCheckout'
@@ -10,6 +10,10 @@ export const useMyAppointments = () => {
   const [appointments, setAppointments] = useState<AppointmentSummary[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [resumingId, setResumingId] = useState<string | null>(null)
+  const [cancellingId, setCancellingId] = useState<string | null>(null)
+  const [cancelTargetId, setCancelTargetId] = useState<string | null>(null)
+  const [cancelCase, setCancelCase] = useState<string | null>(null)
+  const [isCheckingCancellation, setIsCheckingCancellation] = useState(false)
 
   const loadAppointments = () => {
     setIsLoading(true)
@@ -50,5 +54,69 @@ export const useMyAppointments = () => {
     }
   }
 
-  return { appointments, isLoading, resumingId, handleResumePayment }
+  const handleCancelClick = async (appointmentId: string) => {
+    setIsCheckingCancellation(true)
+    try {
+      const response = await cancelAppointment(appointmentId, false)
+
+      if (!response.confirmationRequired) {
+        toast.error(response.message)
+        return
+      }
+
+      setCancelCase(response.case)
+      setCancelTargetId(appointmentId)
+    } catch {
+      toast.error('Could not check this appointment. Please try again.')
+    } finally {
+      setIsCheckingCancellation(false)
+    }
+  }
+
+  const closeCancelDialog = () => {
+    setCancelTargetId(null)
+    setCancelCase(null)
+  }
+
+  const handleConfirmCancel = async () => {
+    if (!cancelTargetId) return
+
+    const appointmentId = cancelTargetId
+    setCancellingId(appointmentId)
+    try {
+      const response = await cancelAppointment(appointmentId, true)
+
+      if (response.confirmationRequired) {
+        toast.error(response.message)
+        return
+      }
+
+      if (response.statusCode === 200) {
+        toast.success(response.message)
+        loadAppointments()
+      } else {
+        toast.error(response.message)
+      }
+    } catch {
+      toast.error('Could not cancel this appointment. Please try again.')
+    } finally {
+      setCancellingId(null)
+      setCancelTargetId(null)
+      setCancelCase(null)
+    }
+  }
+
+  return {
+    appointments,
+    isLoading,
+    resumingId,
+    handleResumePayment,
+    cancellingId,
+    cancelTargetId,
+    cancelCase,
+    isCheckingCancellation,
+    handleCancelClick,
+    closeCancelDialog,
+    handleConfirmCancel,
+  }
 }
