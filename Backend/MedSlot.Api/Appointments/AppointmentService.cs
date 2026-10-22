@@ -54,6 +54,8 @@ namespace MedSlot.Api.Appointments
                 var doctor = a.TimeSlot.Doctor;
                 var ast = a.AppointmentStatus;
                 var ts = a.TimeSlot;
+                bool appointmentCancellable = (ast.StatusName == "PendingPayment" || ast.StatusName == "Confirmed")
+                    && a.TimeSlot.StartTime - DateTime.UtcNow > TimeSpan.FromMinutes(1);
 
                 var mappedAppointment = new AppointmentSummary
                 {
@@ -66,7 +68,8 @@ namespace MedSlot.Api.Appointments
                     BookedAt = a.BookedAt,
                     CreatedAt = a.CreatedAt,
                     Concern = a.PatientConcern,
-                    HoldExpiresAt = a.HoldExpiresAt
+                    HoldExpiresAt = a.HoldExpiresAt,
+                    Cancellable = appointmentCancellable
                 };
 
                 mappedAppointments.Add(mappedAppointment);
@@ -96,10 +99,9 @@ namespace MedSlot.Api.Appointments
         private async Task<CancelAppointmentResponse> InitiateAppointmentCancellationWithRefund(Guid patientid, Guid appointmentId, bool? confirmCancel)
         {
             if (confirmCancel != true)
-                return new CancelAppointmentResponse { StatusCode = 400, Message = "Confirmation Required. Please confirm once to proceed" };
+                return new CancelAppointmentResponse { StatusCode = 400, Message = "Confirmation Required. Please confirm once to proceed" , ConfirmationRequired = true , Case = "InitiateRefundAndCancel" };
 
-            // TODO: refund logic (tier calc + Razorpay refund call) - not yet implemented
-            return new CancelAppointmentResponse { StatusCode = 501, Message = "Cancellation with refund is not yet supported." };
+            return await _paymentService.RefundPaymentAsync(appointmentId);
         }
 
         public async Task ReleaseUnpaidAppointmentsAsync()

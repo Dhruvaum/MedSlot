@@ -9,9 +9,11 @@ namespace MedSlot.Api.Payments
         Task<Doctor> GetDoctorByAppoinmentIdAsync(Guid appointmentId);
         Task CreatePaymentRowAsync(BookAppointmentResponse appointmentResponse, Doctor doctor, string orderId);
         Task MarkPaymentCaptured(string orderId, string paymentId, string? referenceNumber);
-        Task<(List<PaymentAttempt> Items, int Count)> GetPatientPaymentsAsync(Guid patientId, GetTransactionsListingRequest request);
-        Task<List<TransactionSummaryResponse>> MapTransactionsToDtoAsync(List<PaymentAttempt> payments);
+        Task<(List<PaymentAttempt> Items, List<Refund> Refunds)> GetPatientTransactionsAsync(Guid patientId, GetTransactionsListingRequest request);
+        Task<List<TransactionSummaryResponse>> MapTransactionsToDtoAsync(List<PaymentAttempt> payments, List<Refund> refunds);
         Task<List<PaymentStatusOptionResponse>> GetAllPaymentStatusesAsync();
         Task<ResumeBookingPaymentResponse> GetRazorPayOptionsByAppointmentAsync(Guid appointmentId, string keyId);
+        Task<(string gatewayPaymentId, decimal amount, DateTime slotStartTime)> GetCapturedPaymentDetailsAsync(Guid appointmentId);
+        Task RecordRefundAsync(Guid appointmentId, decimal refundAmount, string reason, string gatewayRefundId, string refundReferenceNumber, bool isFullRefund);
     }
 }

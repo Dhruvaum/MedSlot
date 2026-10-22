@@ -4,7 +4,6 @@ using MedSlot.Api.Data;
 using MedSlot.Api.Models;
 using MedSlot.Api.Payments.Dtos;
 using Microsoft.EntityFrameworkCore;
-using Org.BouncyCastle.Asn1.Cms;
 
 namespace MedSlot.Api.Payments
 {
@@ -77,56 +76,102 @@ namespace MedSlot.Api.Payments
             await _context.SaveChangesAsync();
         }
 
-        public async Task<(List<PaymentAttempt> Items, int Count)> GetPatientPaymentsAsync(Guid patientId, GetTransactionsListingRequest request)
+        public async Task<(List<PaymentAttempt> Items, List<Refund> Refunds)> GetPatientTransactionsAsync(Guid patientId, GetTransactionsListingRequest request)
         {
             var query = _context.PaymentAttempts
                 .Include(pa => pa.Payment)
-                .Include(pa => pa.Payment.Appointment)
-                .Include(pa => pa.Payment.Appointment.TimeSlot)
-                .Include(pa => pa.Payment.Appointment.TimeSlot.Doctor)
+                    .ThenInclude(p => p.Appointment)
+                        .ThenInclude(a => a.TimeSlot)
+                            .ThenInclude(t => t.Doctor)
                 .Where(pa => pa.Payment.Appointment.PatientId == patientId)
                 .OrderByDescending(pa => pa.AttemptedAt)
                 .AsQueryable();
 
-            // Filters
-            if(request.PaymentStatus != null)
-            {
-                query = query.Where(pa => pa.PaymentStatusId == request.PaymentStatus);
-            }
+            var refundQuery = _context.Refunds
+                .Include(r => r.Payment)
+                    .ThenInclude(p => p.Appointment)
+                        .ThenInclude(a => a.TimeSlot)
+                            .ThenInclude(t => t.Doctor)
+                .Where(r => r.Payment.Appointment.PatientId == patientId)
+                .OrderByDescending(r => r.RefundedAt)
+                .AsQueryable();
+
+            // Date Filter
             if(request.Date != null)
             {
                 query = query.Where(pa => pa.AttemptedAt == request.Date);
+                refundQuery = refundQuery.Where(r => r.RefundedAt == request.Date);
             }
 
-            // Count
-            var count = await query.CountAsync();
+            List<PaymentAttempt> attempts;
+            List<Refund> refunds;
 
-            // Pagination
-            var items = await query.Skip((request.PageNumber - 1) * request.PageSize).Take(request.PageSize).ToListAsync();
+            // Status Filter
+            if (request.PaymentStatus != null)
+            {
+                var filterStatusName = await _context.PaymentStatuses
+                    .Where(ps => ps.Id == request.PaymentStatus)
+                    .Select(ps => ps.StatusName)
+                    .FirstOrDefaultAsync();
 
-            return (items, count);
+                bool isRefundStatusFilter = filterStatusName == "Refunded" || filterStatusName == "PartiallyRefunded";
+
+                if (isRefundStatusFilter)
+                {
+                    attempts = new List<PaymentAttempt>();
+                    var allRefunds = await refundQuery.ToListAsync();
+                    refunds = allRefunds.Where(r => (filterStatusName == "Refunded") == (r.Amount == r.Payment.Amount)).ToList();
+                }
+                else
+                {
+                    attempts = await query.Where(pa => pa.Payment.PaymentStatusId == request.PaymentStatus).ToListAsync();
+                    refunds = new List<Refund>();
+                }
+            }
+            else
+            {
+                attempts = await query.ToListAsync();
+                refunds = await refundQuery.ToListAsync();
+            }
+
+            return (attempts, refunds);
         }
 
-        public async Task<List<TransactionSummaryResponse>> MapTransactionsToDtoAsync(List<PaymentAttempt> transactions)
+        public async Task<List<TransactionSummaryResponse>> MapTransactionsToDtoAsync(List<PaymentAttempt> attempts, List<Refund> refunds)
         {
-
             var paymentStatuses = await _context.PaymentStatuses.ToListAsync();
 
-            var summarizedTransactions = transactions.Select(t => new TransactionSummaryResponse
+            var mappedAttempts = attempts.Select(t => new TransactionSummaryResponse
             {
                 Id = t.Id,
                 TransactionAmount = t.Payment.Amount,
                 TransactionDate = t.AttemptedAt,
                 TransactionStatus = paymentStatuses.Where(ps => ps.Id == t.PaymentStatusId).Select(ps => ps.StatusName).FirstOrDefault(),
                 ReferenceNumber = t.ReferenceNumber,
-                AppointmentDate = (DateTime)t.Payment.Appointment.TimeSlot.StartTime,
+                AppointmentDate = t.Payment.Appointment.TimeSlot.StartTime,
                 SlotStartTime = t.Payment.Appointment.TimeSlot.StartTime,
                 SlotEndTime = t.Payment.Appointment.TimeSlot.EndTime,
                 Concern = t.Payment.Appointment.PatientConcern,
                 DoctorName = t.Payment.Appointment.TimeSlot.Doctor.FullName
-            }).ToList();
+            });
 
-            return summarizedTransactions;
+            var mappedRefunds = refunds.Select(r => new TransactionSummaryResponse
+            {
+                Id = r.Id,
+                TransactionAmount = r.Amount,
+                TransactionDate = r.RefundedAt ?? r.CreatedAt,
+                TransactionStatus = r.Amount == r.Payment.Amount ? "Refunded" : "PartiallyRefunded",
+                ReferenceNumber = r.ReferenceNumber,
+                AppointmentDate = r.Payment.Appointment.TimeSlot.StartTime,
+                SlotStartTime = r.Payment.Appointment.TimeSlot.StartTime,
+                SlotEndTime = r.Payment.Appointment.TimeSlot.EndTime,
+                Concern = r.Payment.Appointment.PatientConcern,
+                DoctorName = r.Payment.Appointment.TimeSlot.Doctor.FullName
+            });
+
+            return mappedAttempts.Concat(mappedRefunds)
+                .OrderByDescending(t => t.TransactionDate)
+                .ToList();
         }
 
         public async Task<List<PaymentStatusOptionResponse>> GetAllPaymentStatusesAsync()
@@ -152,6 +197,65 @@ namespace MedSlot.Api.Payments
                 Amount = pendingAppointment.Payment.Amount,
                 RazorpayOrderId = pendingAppointment.Payment.GatewayOrderId
             };
+
+        }
+
+        public async Task<(string gatewayPaymentId, decimal amount, DateTime slotStartTime)> GetCapturedPaymentDetailsAsync(Guid appointmentId)
+        {
+            var appointment = await _context.Appointments
+                .Where(a => a.Id == appointmentId)
+                .Include(a => a.TimeSlot)
+                .Include(a => a.Payment)
+                .FirstOrDefaultAsync();
+
+            var capturedAttempt = await _context.PaymentAttempts
+                .Include(pa => pa.PaymentStatus)
+                .Where(pa => pa.PaymentId == appointment.Payment.Id && pa.PaymentStatus.StatusName == "Captured")
+                .OrderByDescending(pa => pa.AttemptedAt)
+                .FirstOrDefaultAsync();
+
+            return (capturedAttempt.GatewayPaymentId, appointment.Payment.Amount, appointment.TimeSlot.StartTime);
+        }
+
+        public async Task RecordRefundAsync(Guid appointmentId, decimal refundAmount, string reason, string gatewayRefundId, string refundReferenceNumber, bool isFullRefund)
+        {
+            var appointment = await _context.Appointments
+                .Include(a => a.TimeSlot)
+                .Include(a => a.Payment)
+                .Where(a => a.Id == appointmentId)
+                .FirstOrDefaultAsync();
+
+            // Get Statuses
+            var cancelledAppointmentStatusId = await _context.AppointmentStatuses
+                .Where(a => a.StatusName == "Cancelled")
+                .Select(a => a.Id)
+                .FirstOrDefaultAsync();
+
+            var refundStatusName = isFullRefund ? "Refunded" : "PartiallyRefunded";
+
+            var refundedPaymentStatusId = await _context.PaymentStatuses
+                .Where(ps => ps.StatusName == refundStatusName)
+                .Select(ps => ps.Id)
+                .FirstOrDefaultAsync();
+
+            var refundRecord = new Refund
+            {
+                Id = Guid.NewGuid(),
+                PaymentId = appointment.Payment.Id,
+                Amount = refundAmount,
+                GatewayRefundId = gatewayRefundId,
+                Reason = reason,
+                RefundedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.UtcNow,
+                ReferenceNumber = refundReferenceNumber
+            };
+
+            await _context.Refunds.AddAsync(refundRecord);
+            appointment.Payment.PaymentStatusId = refundedPaymentStatusId;
+            appointment.AppointmentStatusId = cancelledAppointmentStatusId;
+            appointment.TimeSlot.IsBooked = false;
+
+            await _context.SaveChangesAsync();
 
         }
     }

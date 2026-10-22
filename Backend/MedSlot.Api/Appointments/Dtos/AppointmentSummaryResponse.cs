@@ -17,5 +17,6 @@
         public DateTime CreatedAt { get; set; }
         public string? Concern { get; set; }
         public DateTime? HoldExpiresAt { get; set; }
+        public bool Cancellable { get; set; }
     }
 }

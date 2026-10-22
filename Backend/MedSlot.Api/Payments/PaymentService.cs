@@ -98,21 +98,64 @@ namespace MedSlot.Api.Payments
             return response;
         }
 
+        public async Task<CancelAppointmentResponse> RefundPaymentAsync(Guid appointmentId)
+        {
+            var (gatewayPaymentId, amount, slotStartTime) = await _paymentRepository.GetCapturedPaymentDetailsAsync(appointmentId);
+
+            var timeUntilAppointment = slotStartTime - DateTime.UtcNow;
+            bool isFullRefund = timeUntilAppointment > TimeSpan.FromHours(2);
+
+            var refundAmount = isFullRefund ? amount : amount - 50;
+
+            if (refundAmount < 0) refundAmount = 0;
+
+            var razorpayKeyId = _configuration["Razorpay:KeyId"];
+            var razorpayKeySecret = _configuration["Razorpay:KeySecret"];
+            var razorpayClient = new RazorpayClient(razorpayKeyId, razorpayKeySecret);
+
+            var refundOptions = new Dictionary<string, object>
+            {
+                { "amount", (int)(refundAmount*100) }
+            };
+
+            var payment = razorpayClient.Payment.Fetch(gatewayPaymentId);
+            var refund = payment.Refund(refundOptions);
+
+            var gatewayRefundId = refund["id"].ToString() ?? throw new InvalidOperationException();
+            var refundAcquirerData = refund["acquirer_data"] as Newtonsoft.Json.Linq.JObject;
+            string refundReferenceNumber = refundAcquirerData?["arn"]?.ToString();
+
+            var reason = isFullRefund
+                ? "Patient cancelled - full refund (>2hr before appointment)"
+                : "Patient cancelled - late cancellation penalty (<2hr before appointment)";
+
+            await _paymentRepository.RecordRefundAsync(appointmentId, refundAmount, reason, gatewayRefundId, refundReferenceNumber, isFullRefund);
+
+            return new CancelAppointmentResponse
+            {
+                StatusCode = 200,
+                Message = isFullRefund
+                    ? "Appointment cancelled. Full Refund initiated."
+                    : "Appointment cancelled. A ₹50 late-cancellation penalty was deducted as per compliance of company policy"
+            };
+        }
+
         public async Task<PagedResponse<TransactionSummaryResponse>> GetPatientTransactionsListingAsync(GetTransactionsListingRequest request)
         {
             var patientId = _currentUser.PatientId ?? throw new UnauthorizedAccessException();
 
-            var (Items, Count) = await _paymentRepository.GetPatientPaymentsAsync(patientId, request);
+            var (attempts, refunds) = await _paymentRepository.GetPatientTransactionsAsync(patientId, request);
+            var merged = await _paymentRepository.MapTransactionsToDtoAsync(attempts, refunds);
 
-            // Map payments to transaction dto - TransactionSummaryResponse for Listing scope
-            var mappedTransactions = await _paymentRepository.MapTransactionsToDtoAsync(Items);
+            var count = merged.Count;
+            var items = merged.Skip((request.PageNumber - 1) * request.PageSize).Take(request.PageSize).ToList();
 
             var response = new PagedResponse<TransactionSummaryResponse>
             {
-                Items = mappedTransactions,
+                Items = items,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize,
-                TotalCount = Count,
+                TotalCount = count,
             };
 
             return response;

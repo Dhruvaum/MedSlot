@@ -4,5 +4,7 @@
     {
         public int StatusCode { get; set; }
         public string Message { get; set; }
+        public Boolean? ConfirmationRequired { get; set; } = null;
+        public string? Case { get; set; } = null;
     }
 }
