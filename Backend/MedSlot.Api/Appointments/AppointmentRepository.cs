@@ -93,6 +93,8 @@ namespace MedSlot.Api.Appointments
             var appointment = await _context.Appointments
                 .Include(a => a.TimeSlot)
                 .Include(a => a.Payment)
+                    .ThenInclude(p => p.PaymentStatus)
+                .Include(a => a.AppointmentStatus)
                 .Where(a => a.Id == appointmentId && a.PatientId == patientId)
                 .FirstOrDefaultAsync();
 
@@ -113,6 +115,9 @@ namespace MedSlot.Api.Appointments
 
         public async Task<CancelAppointmentResponse> InitiateNoRefundAppointmentCansellation(Guid patientId, Guid appointmentId, bool? confirmCancel)
         {
+            if (confirmCancel != true)
+                return new CancelAppointmentResponse { StatusCode = 400, Message = "Confirmation Required. Please confirm once to proceed" , ConfirmationRequired = true, Case = "JustCancelNoRefund" };
+
             var appointment = await _context.Appointments
                 .Include(a => a.TimeSlot)
                 .Include(a => a.Payment)

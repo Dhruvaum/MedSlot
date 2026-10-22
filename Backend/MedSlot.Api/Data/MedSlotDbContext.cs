@@ -218,6 +218,7 @@ public partial class MedSlotDbContext : DbContext
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
             entity.Property(e => e.GatewayRefundId).HasMaxLength(100);
             entity.Property(e => e.Reason).HasMaxLength(500);
+            entity.Property(e => e.ReferenceNumber).HasMaxLength(100);
 
             entity.HasOne(d => d.Payment).WithMany(p => p.Refunds)
                 .HasForeignKey(d => d.PaymentId)

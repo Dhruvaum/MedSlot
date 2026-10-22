@@ -19,5 +19,7 @@ public partial class Refund
 
     public DateTime CreatedAt { get; set; }
 
+    public string? ReferenceNumber { get; set; }
+
     public virtual Payment Payment { get; set; } = null!;
 }
