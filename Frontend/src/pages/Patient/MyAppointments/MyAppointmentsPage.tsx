@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
-import { User, MessageSquare, Clock, CheckCircle2, CalendarClock } from 'lucide-react'
+import { User, MessageSquare, Clock, CheckCircle2, CalendarClock, XCircle } from 'lucide-react'
 import Page from '../../../components/Page'
+import ConfirmDialog from '../../../components/ConfirmDialog'
 import { useMyAppointments } from './useMyAppointments'
 import { parseUtcDate } from '../../../utils/date'
 
@@ -45,7 +46,23 @@ const canResumePayment = (appointment: { status: string; holdExpiresAt: string |
   parseUtcDate(appointment.holdExpiresAt) > new Date()
 
 const MyAppointmentsPage = () => {
-  const { appointments, isLoading, resumingId, handleResumePayment } = useMyAppointments()
+  const {
+    appointments,
+    isLoading,
+    resumingId,
+    handleResumePayment,
+    cancellingId,
+    cancelTargetId,
+    cancelCase,
+    handleCancelClick,
+    closeCancelDialog,
+    handleConfirmCancel,
+  } = useMyAppointments()
+
+  const cancelDialogDescription =
+    cancelCase === 'InitiateRefundAndCancel'
+      ? 'Your refund will follow the standard cancellation policy — full refund if cancelled more than 2 hours before the appointment, otherwise a small penalty of Rs 50 applies.'
+      : 'This appointment will be cancelled and the slot will be released.'
 
   return (
     <Page title="My Appointments - MedSlot">
@@ -132,16 +149,28 @@ const MyAppointmentsPage = () => {
                     </div>
                   </div>
 
-                  {canResumePayment(appointment) && (
-                    <div className="mt-5 border-t border-slate-100 pt-4">
-                      <button
-                        type="button"
-                        disabled={resumingId === appointment.id}
-                        onClick={() => handleResumePayment(appointment.id, appointment.holdExpiresAt)}
-                        className="w-full rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
-                      >
-                        {resumingId === appointment.id ? 'Opening checkout...' : 'Resume Payment'}
-                      </button>
+                  {(canResumePayment(appointment) || appointment.cancellable) && (
+                    <div className="mt-5 flex gap-3 border-t border-slate-100 pt-4">
+                      {canResumePayment(appointment) && (
+                        <button
+                          type="button"
+                          disabled={resumingId === appointment.id}
+                          onClick={() => handleResumePayment(appointment.id, appointment.holdExpiresAt)}
+                          className="flex-1 rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
+                        >
+                          {resumingId === appointment.id ? 'Opening checkout...' : 'Resume Payment'}
+                        </button>
+                      )}
+                      {appointment.cancellable && (
+                        <button
+                          type="button"
+                          onClick={() => handleCancelClick(appointment.id)}
+                          className="flex flex-1 items-center justify-center gap-2 rounded-full border border-red-200 px-5 py-2.5 text-sm font-semibold text-red-500 transition hover:bg-red-50 cursor-pointer"
+                        >
+                          <XCircle size={16} />
+                          Cancel Appointment
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>
@@ -150,6 +179,16 @@ const MyAppointmentsPage = () => {
           )}
         </div>
       </div>
+
+      <ConfirmDialog
+        open={!!cancelTargetId}
+        title="Cancel this appointment?"
+        description={cancelDialogDescription}
+        confirmLabel="Yes, Cancel"
+        isConfirming={!!cancellingId}
+        onConfirm={handleConfirmCancel}
+        onCancel={closeCancelDialog}
+      />
     </Page>
   )
 }
