@@ -56,3 +56,19 @@ export interface DoctorAvailability{
     consultDurationMinutes: number,
     consultationFee: number
 }
+
+export interface GetDoctorAppointmentsRequest{
+    date?: string | null,
+    status?: string | null,
+    pageNumber: number,
+    pageSize: number
+}
+
+export interface DoctorAppointmentSummary{
+    id: string,
+    patientName: string,
+    startTime: string,
+    endTime: string,
+    status: string,
+    concern?: string | null
+}
