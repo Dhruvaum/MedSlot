@@ -105,6 +105,31 @@ namespace MedSlot.Api.Doctors
             return doctor;
         }
 
+        public async Task<(List<Appointment> Items, int Count)> GetDoctorAppointmentsAsync(Guid doctorId, GetDoctorAppoinmentsRequest request)
+        {
+            var query = _context.Appointments
+                .Include(a => a.TimeSlot)
+                .Include(a => a.Patient)
+                .Include(a => a.AppointmentStatus)
+                .Where(a => a.TimeSlot.DoctorId == doctorId)
+                .AsQueryable();
+
+            // Filters
+            if (request.Status != null)
+            {
+                query = query.Where(a => a.AppointmentStatusId == request.Status);
+            }
+            if (request.Date != null)
+            {
+                query = query.Where(a => a.TimeSlot.StartTime == request.Date);
+            }
+
+            var count = await query.CountAsync();
+            var items = await query.Skip((request.PageNumber - 1) * request.PageSize).Take(request.PageSize).ToListAsync();
+
+            return (items, count);
+        }
+
         public async Task SetAvailabilityAsync(Guid doctorId, int consultDurationMinutes, decimal consultationFee, List<DoctorAvailability> newRows)
         {
             var existingRows = await _context.DoctorAvailabilities

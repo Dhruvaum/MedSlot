@@ -112,6 +112,33 @@ namespace MedSlot.Api.Doctors
             return MapToViewDoctorProfileResponse(doctorData);
         }
 
+        public async Task<PagedResponse<DoctorAppointmentSummary>> GetDoctorAppointmentsAsync(GetDoctorAppoinmentsRequest request)
+        {
+            var doctorId = _currentUser.DoctorId ?? throw new UnauthorizedAccessException();
+
+            var (Items, Count) = await _doctorRepository.GetDoctorAppointmentsAsync(doctorId, request);
+
+            // Map
+
+            var mappedAppointments = Items.Select(a => new DoctorAppointmentSummary
+            {
+                Id = a.Id,
+                PatientName = a.Patient.FullName,
+                StartTime = a.TimeSlot.StartTime,
+                EndTime = a.TimeSlot.EndTime,
+                Status = a.AppointmentStatus.StatusName,
+                Concern = a.PatientConcern
+            }).ToList();
+
+            return new PagedResponse<DoctorAppointmentSummary>
+            {
+                Items = mappedAppointments,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize,
+                TotalCount = Count
+            };
+        }
+
         private static ViewDoctorProfileResponse MapToViewDoctorProfileResponse(Doctor doctorData) => new()
         {
             Id = doctorData.Id,

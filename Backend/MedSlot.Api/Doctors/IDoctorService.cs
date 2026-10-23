@@ -13,6 +13,7 @@ namespace MedSlot.Api.Doctors
         public Task<PagedResponse<DoctorSummaryResponse>> GetDoctorsListingAsync(GetDoctorsListingRequest request);
         public Task<ViewDoctorProfileResponse> ViewDoctorProfileAsync(Guid Id);
         public Task<ViewDoctorProfileResponse> ViewMyProfileAsync();
+        public Task<PagedResponse<DoctorAppointmentSummary>> GetDoctorAppointmentsAsync(GetDoctorAppoinmentsRequest request);
 
     }
 }
