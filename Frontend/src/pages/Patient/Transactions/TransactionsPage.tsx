@@ -1,4 +1,4 @@
-import { Receipt, CalendarClock, User, Hash, MessageSquare, ChevronLeft, ChevronRight, IndianRupee } from 'lucide-react'
+import { Receipt, CalendarClock, User, Hash, MessageSquare, ChevronLeft, ChevronRight, IndianRupee, Undo2 } from 'lucide-react'
 import Page from '../../../components/Page'
 import { useTransactions } from './useTransactions'
 
@@ -106,7 +106,10 @@ const TransactionsPage = () => {
             </div>
           ) : (
             <div className="flex flex-col gap-4">
-              {transactions.map((transaction) => (
+              {transactions.map((transaction) => {
+                const isRefund = transaction.transactionStatus === 'Refunded' || transaction.transactionStatus === 'PartiallyRefunded'
+
+                return (
                 <div
                   key={transaction.id}
                   className="relative overflow-hidden rounded-2xl border border-slate-100 bg-white p-6 pl-7 shadow-sm"
@@ -135,11 +138,16 @@ const TransactionsPage = () => {
                     </div>
 
                     <div className="shrink-0 text-right">
-                      <div className="flex items-center justify-end gap-0.5 text-xl font-bold text-slate-800">
-                        <IndianRupee size={17} className="text-slate-500" />
+                      <div
+                        className={`flex items-center justify-end gap-0.5 text-xl font-bold ${
+                          isRefund ? 'text-emerald-600' : 'text-slate-800'
+                        }`}
+                      >
+                        {isRefund && <span>+</span>}
+                        <IndianRupee size={17} className={isRefund ? 'text-emerald-500' : 'text-slate-500'} />
                         {transaction.transactionAmount}
                       </div>
-                      <div className="text-xs text-slate-400">Amount</div>
+                      <div className="text-xs text-slate-400">{isRefund ? 'Refunded' : 'Amount'}</div>
                     </div>
                   </div>
 
@@ -159,10 +167,16 @@ const TransactionsPage = () => {
                     </div>
 
                     <div>
-                      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Payment</p>
+                      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        {isRefund ? 'Refund' : 'Payment'}
+                      </p>
                       <div className="flex items-center gap-2 text-sm text-slate-600">
-                        <Receipt size={15} className="shrink-0 text-slate-400" />
-                        Paid on {formatDate(transaction.transactionDate)}
+                        {isRefund ? (
+                          <Undo2 size={15} className="shrink-0 text-slate-400" />
+                        ) : (
+                          <Receipt size={15} className="shrink-0 text-slate-400" />
+                        )}
+                        {isRefund ? 'Refunded on' : 'Paid on'} {formatDate(transaction.transactionDate)}
                       </div>
                       {transaction.referenceNumber && (
                         <div className="mt-2 flex items-center gap-2 text-sm text-slate-500">
@@ -173,7 +187,8 @@ const TransactionsPage = () => {
                     </div>
                   </div>
                 </div>
-              ))}
+                )
+              })}
             </div>
           )}
 
