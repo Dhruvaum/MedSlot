@@ -80,5 +80,13 @@ namespace MedSlot.Api.Doctors
             var response = await _doctorService.GetDoctorAppointmentsAsync(request);
             return Ok(response);
         }
+
+        [HttpPost("markAppointmentOutcome")]
+        [Authorize(Roles = "Doctor")]
+        public async Task<ActionResult> MarkAppointmentOutcome([FromBody] MarkAppointmentOutcomeRequest request)
+        {
+            await _doctorService.MarkAppointmentOutcomeAsync(request);
+            return Ok();
+        }
     }
 }
