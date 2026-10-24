@@ -138,6 +138,16 @@ namespace MedSlot.Api.Doctors
                 TotalCount = Count
             };
         }
+        
+        public async Task MarkAppointmentOutcomeAsync(MarkAppointmentOutcomeRequest request)
+        {
+            var doctorId = _currentUser.DoctorId ?? throw new UnauthorizedAccessException();
+
+            Guid appointmentId = request.AppointmentId;
+            string outcome = request.Outcome;
+
+            await _doctorRepository.MarkAppointmentOutcomeAsync(doctorId, appointmentId, outcome);
+        }
 
         private static ViewDoctorProfileResponse MapToViewDoctorProfileResponse(Doctor doctorData) => new()
         {
@@ -248,6 +258,7 @@ namespace MedSlot.Api.Doctors
 
             return new DoctorAvailabilityResponse { Days = days, ConsultDurationMinutes = consultDurationMinutes , ConsultationFee = ConsultationFee};
         }
+
 
     }
 }

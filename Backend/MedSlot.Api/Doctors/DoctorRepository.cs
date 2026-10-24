@@ -91,6 +91,37 @@ namespace MedSlot.Api.Doctors
 
             return (items, totalCount);
         }
+        
+        public async Task MarkAppointmentOutcomeAsync(Guid doctorId, Guid appointmentId, string outcome)
+        {
+            // Validate
+            
+            var appointment = await _context.Appointments
+                .Include(a => a.TimeSlot)
+                .Include(a => a.AppointmentStatus)
+                .Where(a => a.Id == appointmentId
+                    && a.TimeSlot.DoctorId == doctorId
+                    && DateTime.UtcNow >= a.TimeSlot.EndTime
+                    && a.AppointmentStatus.StatusName == "Confirmed"
+                )
+                .FirstOrDefaultAsync();
+
+            if (appointment == null) throw new InvalidOperationException("An Error Occured. Status update could not be processed for this appointment");
+
+            if (outcome != "Completed" && outcome != "NoShow") throw new InvalidOperationException("Invalid Status Update Request");
+
+            Guid outcomeStatusId = outcome == "Completed"
+                ? await _context.AppointmentStatuses.Where(a => a.StatusName == "Completed").Select(a => a.Id).FirstOrDefaultAsync()
+                : outcome == "NoShow"
+                ? await _context.AppointmentStatuses.Where(a => a.StatusName == "NoShow").Select(a => a.Id).FirstOrDefaultAsync()
+                : Guid.Empty;
+
+            if (outcomeStatusId == Guid.Empty) throw new InvalidDataException();
+
+            appointment.AppointmentStatusId = outcomeStatusId;
+
+            await _context.SaveChangesAsync();
+        }
 
         public async Task<Doctor> GetDoctorByIdAsync(Guid doctorId)
         {
@@ -112,6 +143,7 @@ namespace MedSlot.Api.Doctors
                 .Include(a => a.Patient)
                 .Include(a => a.AppointmentStatus)
                 .Where(a => a.TimeSlot.DoctorId == doctorId)
+                .OrderByDescending(a => a.CreatedAt)
                 .AsQueryable();
 
             // Filters
