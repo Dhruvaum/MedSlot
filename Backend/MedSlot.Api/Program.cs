@@ -8,6 +8,7 @@ using Hangfire;
 using MedSlot.Api.BackgroundJobs;
 using MedSlot.Api.Appointments;
 using MedSlot.Api.Payments;
+using MedSlot.Api.Admin;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,6 +55,7 @@ builder.Services.AddPatientServices();
 builder.Services.AddDoctorServices();
 builder.Services.AddAppointmentServices();
 builder.Services.AddPaymentServices();
+builder.Services.AddAdminServices();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddOtherServices();
 
