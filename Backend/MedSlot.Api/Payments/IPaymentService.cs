@@ -9,8 +9,9 @@ namespace MedSlot.Api.Payments
         Task<InitiatePaymentResponse> InitiatePaymentAsync(BookAppointmentResponse appointment);
         Task VerifyPaymentAsync(VerifyPaymentRequest request);
         Task<ResumeBookingPaymentResponse> ResumeBookingPaymentAsync(Guid appointmentId);
-        Task<CancelAppointmentResponse> RefundPaymentAsync(Guid appointmentId);
+        Task<CancelAppointmentResponse> InitiateRefundAndCancelAppointmentAsync(Guid appointmentId, string refundType);
         Task<PagedResponse<TransactionSummaryResponse>> GetPatientTransactionsListingAsync(GetTransactionsListingRequest request);
         Task<List<PaymentStatusOptionResponse>> GetPaymentStatusOptionsAsync();
+        Task ReleaseEligibleFundsAsync();
     }
 }

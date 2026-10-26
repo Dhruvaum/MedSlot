@@ -82,7 +82,7 @@ namespace MedSlot.Api.Appointments
         {
             var patientId = _currentUser.PatientId ?? throw new UnauthorizedAccessException();
 
-            string determinedCase = await _appointmentRepository.DetermineCancellationCaseAsync(patientId, appointmentId);
+            var (determinedCase, refundType) = await _appointmentRepository.DetermineCancellationCaseAsync(patientId, appointmentId);
 
             if (determinedCase == null)
                 return new CancelAppointmentResponse { StatusCode = 500, Message = "An enexpected error occured" };
@@ -91,17 +91,17 @@ namespace MedSlot.Api.Appointments
                 return await _appointmentRepository.InitiateNoRefundAppointmentCansellation(patientId, appointmentId, confirmCancel);
 
             else if(determinedCase == "InitiateRefundAndCancel")
-                return await InitiateAppointmentCancellationWithRefund(patientId, appointmentId, confirmCancel);
+                return await InitiateAppointmentCancellationWithRefund(patientId, appointmentId, confirmCancel, refundType);
 
             return new CancelAppointmentResponse { StatusCode = 500, Message = "Could not proceed with the request. Please try again later"};
         }
 
-        private async Task<CancelAppointmentResponse> InitiateAppointmentCancellationWithRefund(Guid patientid, Guid appointmentId, bool? confirmCancel)
+        private async Task<CancelAppointmentResponse> InitiateAppointmentCancellationWithRefund(Guid patientid, Guid appointmentId, bool? confirmCancel, string? refundType)
         {
             if (confirmCancel != true)
-                return new CancelAppointmentResponse { StatusCode = 400, Message = "Confirmation Required. Please confirm once to proceed" , ConfirmationRequired = true , Case = "InitiateRefundAndCancel" };
+                return new CancelAppointmentResponse { StatusCode = 400, Message = "Confirmation Required. Please confirm once to proceed" , ConfirmationRequired = true , Case = "InitiateRefundAndCancel" , RefundType = refundType };
 
-            return await _paymentService.RefundPaymentAsync(appointmentId);
+            return await _paymentService.InitiateRefundAndCancelAppointmentAsync(appointmentId, refundType);
         }
 
         public async Task ReleaseUnpaidAppointmentsAsync()

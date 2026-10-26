@@ -91,6 +91,12 @@ using (var scope = app.Services.CreateScope())
         job => job.RunAsync(),
         "*/2 * * * *"
     );
+
+    recurringJobManager.AddOrUpdate<ReleaseEligibleFundsJob>(
+        "release-funds",
+        job => job.RunAsync(),
+        "*/5 * * * *"
+    );
 }
 
 // Configure the HTTP request pipeline.

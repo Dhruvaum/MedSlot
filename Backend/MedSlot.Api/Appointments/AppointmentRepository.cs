@@ -82,7 +82,7 @@ namespace MedSlot.Api.Appointments
             return appointments;
         }
 
-        public async Task<string> DetermineCancellationCaseAsync(Guid patientId, Guid appointmentId)
+        public async Task<(string determinedCase, string? refundType)> DetermineCancellationCaseAsync(Guid patientId, Guid appointmentId)
         {
             // Rules:
             // Case 1: Cancel without Refund => [Appointment Status = PendingPayment, PaymentStatus = Created]
@@ -107,10 +107,15 @@ namespace MedSlot.Api.Appointments
             var appointmentStatusName = appointment.AppointmentStatus.StatusName;
             var paymentStatusName = appointment.Payment.PaymentStatus.StatusName;
 
-            if (appointmentStatusName == "PendingPayment" && paymentStatusName == "Created") return "JustCancelNoRefund";
-            else if (appointmentStatusName == "Confirmed" && paymentStatusName == "Captured") return "InitiateRefundAndCancel";
+            if (appointmentStatusName == "PendingPayment" && paymentStatusName == "Created") return ("JustCancelNoRefund", null);
+            else if (appointmentStatusName == "Confirmed" && paymentStatusName == "Captured")
+            {
+                bool isFullRefund = appointment.TimeSlot.StartTime - DateTime.UtcNow > TimeSpan.FromHours(2);
+                string refundType = isFullRefund ? "FullRefund" : "PartialRefund";
+                return ("InitiateRefundAndCancel", refundType);
+            }
 
-            return null;
+            return (null, null);
         }
 
         public async Task<CancelAppointmentResponse> InitiateNoRefundAppointmentCansellation(Guid patientId, Guid appointmentId, bool? confirmCancel)

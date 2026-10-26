@@ -98,15 +98,12 @@ namespace MedSlot.Api.Payments
             return response;
         }
 
-        public async Task<CancelAppointmentResponse> RefundPaymentAsync(Guid appointmentId)
+        public async Task<CancelAppointmentResponse> InitiateRefundAndCancelAppointmentAsync(Guid appointmentId, string refundType)
         {
             var (gatewayPaymentId, amount, slotStartTime) = await _paymentRepository.GetCapturedPaymentDetailsAsync(appointmentId);
 
-            var timeUntilAppointment = slotStartTime - DateTime.UtcNow;
-            bool isFullRefund = timeUntilAppointment > TimeSpan.FromHours(2);
-
+            bool isFullRefund = refundType == "FullRefund";
             var refundAmount = isFullRefund ? amount : amount - 50;
-
             if (refundAmount < 0) refundAmount = 0;
 
             var razorpayKeyId = _configuration["Razorpay:KeyId"];
@@ -115,7 +112,7 @@ namespace MedSlot.Api.Payments
 
             var refundOptions = new Dictionary<string, object>
             {
-                { "amount", (int)(refundAmount*100) }
+                { "amount", (int)(refundAmount * 100) }
             };
 
             var payment = razorpayClient.Payment.Fetch(gatewayPaymentId);
@@ -129,7 +126,7 @@ namespace MedSlot.Api.Payments
                 ? "Patient cancelled - full refund (>2hr before appointment)"
                 : "Patient cancelled - late cancellation penalty (<2hr before appointment)";
 
-            await _paymentRepository.RecordRefundAsync(appointmentId, refundAmount, reason, gatewayRefundId, refundReferenceNumber, isFullRefund);
+            await _paymentRepository.RecordRefundAsync(appointmentId, refundAmount, reason, gatewayRefundId, refundReferenceNumber);
 
             return new CancelAppointmentResponse
             {
@@ -164,6 +161,11 @@ namespace MedSlot.Api.Payments
         public async Task<List<PaymentStatusOptionResponse>> GetPaymentStatusOptionsAsync()
         {
             return await _paymentRepository.GetAllPaymentStatusesAsync();
+        }
+
+        public async Task ReleaseEligibleFundsAsync()
+        {
+            await _paymentRepository.ReleaseEligibleFundsAsync();
         }
     }
 }
