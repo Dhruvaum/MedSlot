@@ -19,6 +19,10 @@ public partial class Payment
 
     public DateTime? UpdatedAt { get; set; }
 
+    public DateTime? FundsReleasedAt { get; set; }
+
+    public bool IsEligibleForRelease { get; set; }
+
     public virtual Appointment Appointment { get; set; } = null!;
 
     public virtual ICollection<PaymentAttempt> PaymentAttempts { get; set; } = new List<PaymentAttempt>();

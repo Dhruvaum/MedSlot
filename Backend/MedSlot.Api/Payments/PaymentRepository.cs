@@ -217,7 +217,7 @@ namespace MedSlot.Api.Payments
             return (capturedAttempt.GatewayPaymentId, appointment.Payment.Amount, appointment.TimeSlot.StartTime);
         }
 
-        public async Task RecordRefundAsync(Guid appointmentId, decimal refundAmount, string reason, string gatewayRefundId, string refundReferenceNumber, bool isFullRefund)
+        public async Task RecordRefundAsync(Guid appointmentId, decimal refundAmount, string reason, string gatewayRefundId, string refundReferenceNumber)
         {
             var appointment = await _context.Appointments
                 .Include(a => a.TimeSlot)
@@ -231,10 +231,8 @@ namespace MedSlot.Api.Payments
                 .Select(a => a.Id)
                 .FirstOrDefaultAsync();
 
-            var refundStatusName = isFullRefund ? "Refunded" : "PartiallyRefunded";
-
-            var refundedPaymentStatusId = await _context.PaymentStatuses
-                .Where(ps => ps.StatusName == refundStatusName)
+            var refundInitiatedStatusId = await _context.PaymentStatuses
+                .Where(ps => ps.StatusName == "RefundInitiated")
                 .Select(ps => ps.Id)
                 .FirstOrDefaultAsync();
 
@@ -245,18 +243,34 @@ namespace MedSlot.Api.Payments
                 Amount = refundAmount,
                 GatewayRefundId = gatewayRefundId,
                 Reason = reason,
-                RefundedAt = DateTime.UtcNow,
+                RefundedAt = null,
                 CreatedAt = DateTime.UtcNow,
                 ReferenceNumber = refundReferenceNumber
             };
 
             await _context.Refunds.AddAsync(refundRecord);
-            appointment.Payment.PaymentStatusId = refundedPaymentStatusId;
+
+            appointment.Payment.PaymentStatusId = refundInitiatedStatusId;
             appointment.AppointmentStatusId = cancelledAppointmentStatusId;
             appointment.TimeSlot.IsBooked = false;
 
             await _context.SaveChangesAsync();
+        }
 
+        public async Task ReleaseEligibleFundsAsync()
+        {
+            var releasablePayments = await _context.Payments
+                .Include(p => p.PaymentStatus)
+                .Where(p => p.IsEligibleForRelease == true && p.PaymentStatus.StatusName == "Captured")
+                .ToListAsync();
+
+            // Mark Released At
+            foreach(var payment in releasablePayments)
+            {
+                payment.FundsReleasedAt = DateTime.UtcNow;
+            }
+
+            await _context.SaveChangesAsync();
         }
     }
 }
