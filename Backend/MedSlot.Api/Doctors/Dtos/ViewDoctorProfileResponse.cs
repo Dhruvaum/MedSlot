@@ -9,5 +9,6 @@
         public string RegistrationNumber { get; set; } = null!;
         public string RegisteringCouncil { get; set; } = null!;
         public string WorkAddress { get; set; } = null!;
+        public int VerificationStatus { get; set; }
     }
 }

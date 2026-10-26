@@ -157,7 +157,8 @@ namespace MedSlot.Api.Doctors
             QualificationName = doctorData.Qualification?.Name,
             RegistrationNumber = doctorData.RegistrationNumber,
             RegisteringCouncil = doctorData.RegisteringCouncil?.Name,
-            WorkAddress = doctorData.WorkAddress
+            WorkAddress = doctorData.WorkAddress,
+            VerificationStatus = doctorData.VerificationStatus,
         };
 
 
