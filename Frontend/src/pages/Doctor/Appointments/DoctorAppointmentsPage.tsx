@@ -1,6 +1,8 @@
-import { User, MessageSquare, CalendarClock, ChevronLeft, ChevronRight } from 'lucide-react'
+import { User, MessageSquare, CalendarClock, ChevronLeft, ChevronRight, CheckCircle2, XCircle } from 'lucide-react'
 import Page from '../../../components/Page'
+import ConfirmDialog from '../../../components/ConfirmDialog'
 import { useDoctorAppointments } from './useDoctorAppointments'
+import { parseUtcDate } from '../../../utils/date'
 
 const formatDate = (iso: string) =>
   new Date(iso).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' })
@@ -26,6 +28,9 @@ const statusBarStyles: Record<string, string> = {
   PaymentFailed: 'bg-orange-400',
 }
 
+const canMarkOutcome = (appointment: { status: string; endTime: string }) =>
+  appointment.status === 'Confirmed' && parseUtcDate(appointment.endTime) <= new Date()
+
 const DoctorAppointmentsPage = () => {
   const {
     appointments,
@@ -36,6 +41,11 @@ const DoctorAppointmentsPage = () => {
     date,
     handleDateChange,
     clearFilters,
+    updatingId,
+    outcomeTarget,
+    handleOutcomeClick,
+    closeOutcomeDialog,
+    handleConfirmOutcome,
   } = useDoctorAppointments()
 
   return (
@@ -120,6 +130,29 @@ const DoctorAppointmentsPage = () => {
                       <span className="line-clamp-2">{appointment.concern || 'No concern specified'}</span>
                     </div>
                   </div>
+
+                  {canMarkOutcome(appointment) && (
+                    <div className="mt-5 flex gap-3 border-t border-slate-100 pt-4">
+                      <button
+                        type="button"
+                        disabled={updatingId === appointment.id}
+                        onClick={() => handleOutcomeClick(appointment.id, 'Completed')}
+                        className="flex flex-1 items-center justify-center gap-2 rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
+                      >
+                        <CheckCircle2 size={16} />
+                        Mark Completed
+                      </button>
+                      <button
+                        type="button"
+                        disabled={updatingId === appointment.id}
+                        onClick={() => handleOutcomeClick(appointment.id, 'NoShow')}
+                        className="flex flex-1 items-center justify-center gap-2 rounded-full border border-amber-200 px-5 py-2.5 text-sm font-semibold text-amber-600 transition hover:bg-amber-50 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
+                      >
+                        <XCircle size={16} />
+                        Mark No-Show
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -152,6 +185,20 @@ const DoctorAppointmentsPage = () => {
           )}
         </div>
       </div>
+
+      <ConfirmDialog
+        open={!!outcomeTarget}
+        title={outcomeTarget?.outcome === 'Completed' ? 'Mark this appointment as completed?' : 'Mark this patient as a no-show?'}
+        description={
+          outcomeTarget?.outcome === 'Completed'
+            ? 'This confirms the consultation took place.'
+            : 'This confirms the patient did not show up for this appointment.'
+        }
+        confirmLabel="Confirm"
+        isConfirming={!!updatingId}
+        onConfirm={handleConfirmOutcome}
+        onCancel={closeOutcomeDialog}
+      />
     </Page>
   )
 }

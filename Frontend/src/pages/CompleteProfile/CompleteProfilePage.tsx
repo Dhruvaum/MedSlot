@@ -8,7 +8,7 @@ const CompleteProfilePage = () => {
 
   return (
     <Page title="Complete Your Profile - MedSlot">
-      {role === 'Patient' ? <PatientForm/> : <DoctorForm/>}
+      {role === 'Patient' ? <PatientForm/> : role === "Doctor" ? <DoctorForm/> : null}
     </Page>
   );
 }
