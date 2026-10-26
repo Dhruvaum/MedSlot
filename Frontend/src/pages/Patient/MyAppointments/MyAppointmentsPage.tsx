@@ -54,15 +54,18 @@ const MyAppointmentsPage = () => {
     cancellingId,
     cancelTargetId,
     cancelCase,
+    cancelRefundType,
     handleCancelClick,
     closeCancelDialog,
     handleConfirmCancel,
   } = useMyAppointments()
 
   const cancelDialogDescription =
-    cancelCase === 'InitiateRefundAndCancel'
-      ? 'Your refund will follow the standard cancellation policy — full refund if cancelled more than 2 hours before the appointment, otherwise a small penalty of Rs 50 applies.'
-      : 'This appointment will be cancelled and the slot will be released.'
+    cancelCase !== 'InitiateRefundAndCancel'
+      ? 'This appointment will be cancelled and the slot will be released.'
+      : cancelRefundType === 'FullRefund'
+      ? 'You will receive a full refund since this is more than 2 hours before the appointment.'
+      : 'A Rs 50 late-cancellation penalty will apply since this is within 2 hours of the appointment.'
 
   return (
     <Page title="My Appointments - MedSlot">

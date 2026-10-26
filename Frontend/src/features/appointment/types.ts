@@ -46,5 +46,6 @@ export interface CancelAppointmentResponse{
     statusCode: number,
     message: string,
     confirmationRequired: boolean | null,
-    case: string | null
+    case: string | null,
+    refundType: string | null
 }

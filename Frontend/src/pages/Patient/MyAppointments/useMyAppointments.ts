@@ -13,6 +13,7 @@ export const useMyAppointments = () => {
   const [cancellingId, setCancellingId] = useState<string | null>(null)
   const [cancelTargetId, setCancelTargetId] = useState<string | null>(null)
   const [cancelCase, setCancelCase] = useState<string | null>(null)
+  const [cancelRefundType, setCancelRefundType] = useState<string | null>(null)
   const [isCheckingCancellation, setIsCheckingCancellation] = useState(false)
 
   const loadAppointments = () => {
@@ -65,6 +66,7 @@ export const useMyAppointments = () => {
       }
 
       setCancelCase(response.case)
+      setCancelRefundType(response.refundType)
       setCancelTargetId(appointmentId)
     } catch {
       toast.error('Could not check this appointment. Please try again.')
@@ -76,6 +78,7 @@ export const useMyAppointments = () => {
   const closeCancelDialog = () => {
     setCancelTargetId(null)
     setCancelCase(null)
+    setCancelRefundType(null)
   }
 
   const handleConfirmCancel = async () => {
@@ -103,6 +106,7 @@ export const useMyAppointments = () => {
       setCancellingId(null)
       setCancelTargetId(null)
       setCancelCase(null)
+      setCancelRefundType(null)
     }
   }
 
@@ -114,6 +118,7 @@ export const useMyAppointments = () => {
     cancellingId,
     cancelTargetId,
     cancelCase,
+    cancelRefundType,
     isCheckingCancellation,
     handleCancelClick,
     closeCancelDialog,
