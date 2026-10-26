@@ -39,7 +39,8 @@ export interface ViewDoctorProfileResponse{
     qualificationName: string | null,
     registrationNumber: string,
     registeringCouncil: string,
-    workAddress: string
+    workAddress: string,
+    verificationStatus: number
 }
 
 export interface DayAvailability{
@@ -71,4 +72,9 @@ export interface DoctorAppointmentSummary{
     endTime: string,
     status: string,
     concern?: string | null
+}
+
+export interface MarkAppointmentOutcomeRequest{
+    appointmentId: string,
+    outcome: 'Completed' | 'NoShow'
 }

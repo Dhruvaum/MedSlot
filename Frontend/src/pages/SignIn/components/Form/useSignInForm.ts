@@ -5,7 +5,7 @@ import { login } from '../../../../features/auth/AuthService'
 import type { LoginResponse } from '../../../../features/auth/types'
 import { toast } from 'sonner'
 import { useNavigate } from 'react-router-dom'
-import { decodeToken, type TokenPayload } from '../../../../utils/token'
+import { decodeToken } from '../../../../utils/token'
 
 export interface SignInCredentials {
   userName: string
@@ -46,13 +46,20 @@ export const useSignInForm = () => {
       await signInSchema.validate(credentials, { abortEarly: false })
       setErrors({})
 
-      // TODO: wire to real sign-in API once the service file is ready
       const response:LoginResponse = await login(credentials);
       if(response && response.authToken){
+        const {role} = decodeToken(response.authToken);
+
         toast.success("Signed In Successfully");
 
         localStorage.setItem("authToken", response.authToken);
         localStorage.setItem('isRegistrationCompleted', `${response.isRegistrationCompleted}`)
+
+        // Check whether Admin
+        if (role === 'Admin') {
+          navigate('/admin/pending-doctors')
+          return
+        }
 
         // Catch and redirect if registration is not completed
         if(!response.isRegistrationCompleted){
@@ -60,8 +67,7 @@ export const useSignInForm = () => {
           return;
         }
 
-        // Niavgate on the basis of decoded token's role
-        const {role} = decodeToken(response.authToken);
+        // Navigate on the basis of decoded token's role
         if(role){
           if(role === 'Patient') navigate('/patient');
           else if(role === 'Doctor') navigate('/doctor');
