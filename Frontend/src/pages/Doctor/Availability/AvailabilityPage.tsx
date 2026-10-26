@@ -95,7 +95,7 @@ const AvailabilityPage = () => {
                       type="checkbox"
                       checked={!day.isOff}
                       onChange={(e) => updateDay(dayOfWeek, { isOff: !e.target.checked })}
-                      className="h-4 w-4 accent-brand"
+                      className="h-4 w-4 accent-brand cursor-pointer"
                     />
                     Available
                   </label>
@@ -124,7 +124,7 @@ const AvailabilityPage = () => {
                       <button
                         type="button"
                         onClick={() => applyToAllDays(day)}
-                        className="flex items-center gap-1 text-xs font-medium text-brand hover:underline"
+                        className="flex items-center gap-1 text-xs font-medium text-brand hover:underline cursor-pointer"
                       >
                         <Copy size={14} />
                         Apply to all days
@@ -136,7 +136,7 @@ const AvailabilityPage = () => {
                         type="checkbox"
                         checked={hasBreak}
                         onChange={(e) => toggleBreak(dayOfWeek, e.target.checked)}
-                        className="h-4 w-4 accent-brand"
+                        className="h-4 w-4 accent-brand cursor-pointer"
                       />
                       <Coffee size={14} />
                       Add a break

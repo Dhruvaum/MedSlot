@@ -64,7 +64,7 @@ const PatientForm = () => {
         
         <button
           type="submit"
-          className="mt-2 rounded-full bg-brand px-6 py-3 font-semibold text-white shadow-sm transition hover:opacity-90"
+          className="mt-2 rounded-full bg-brand px-6 py-3 font-semibold text-white shadow-sm transition hover:opacity-90 cursor-pointer"
         >
           Save Profile
         </button>
