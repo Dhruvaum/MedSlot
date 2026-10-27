@@ -40,6 +40,9 @@ const DoctorAppointmentsPage = () => {
     isLoading,
     date,
     handleDateChange,
+    statusOptions,
+    status,
+    handleStatusChange,
     clearFilters,
     updatingId,
     outcomeTarget,
@@ -65,7 +68,21 @@ const DoctorAppointmentsPage = () => {
             />
           </div>
 
-          {date && (
+          <div>
+            <label className="mb-1 block text-xs font-medium text-slate-500">Status</label>
+            <select
+              value={status ?? ''}
+              onChange={(e) => handleStatusChange(e.target.value)}
+              className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-brand"
+            >
+              <option value="">All</option>
+              {statusOptions.map((option) => (
+                <option key={option.id} value={option.id}>{option.name}</option>
+              ))}
+            </select>
+          </div>
+
+          {(date || status) && (
             <button
               type="button"
               onClick={clearFilters}
@@ -83,7 +100,7 @@ const DoctorAppointmentsPage = () => {
             <div className="flex flex-col items-center gap-3 py-20 text-center">
               <CalendarClock size={32} className="text-slate-300" />
               <p className="text-sm text-slate-400">
-                {date ? 'No appointments on this date.' : "You don't have any appointments yet."}
+                {date || status ? 'No appointments match these filters.' : "You don't have any appointments yet."}
               </p>
             </div>
           ) : (
