@@ -16,6 +16,7 @@ namespace MedSlot.Api.Doctors
         public Task<Doctor> GetDoctorByIdAsync(Guid Id);
         public Task<(List<Appointment> Items, int Count)> GetDoctorAppointmentsAsync(Guid doctorId, GetDoctorAppoinmentsRequest request);
         public Task MarkAppointmentOutcomeAsync(Guid doctorId, Guid appointmentId, string outcome);
+        public Task<List<AppointmentStatusOptionResponse>> GetDoctorAppointmentStatusOptionsAsync();
 
         // Doctor Availability
         public Task SetAvailabilityAsync(Guid doctorId, int consultDurationMinutes, decimal consultationFee, List<DoctorAvailability> newRows);

@@ -76,9 +76,9 @@ namespace MedSlot.Api.Doctors
             {
                 query = query.Where(d => d.QualificationId == request.QualificationId);
             }
-            if(request.consultationFee is not null)
+            if(request.MaxConsultationFee is not null)
             {
-                query = query.Where(d => d.ConsultationFee == request.consultationFee);
+                query = query.Where(d => d.ConsultationFee <= request.MaxConsultationFee);
             }
 
             // Get Total count
@@ -120,7 +120,6 @@ namespace MedSlot.Api.Doctors
 
             await _context.SaveChangesAsync();
 
-            //if(outcome == "")
         }
 
         public async Task<Doctor> GetDoctorByIdAsync(Guid doctorId)
@@ -147,19 +146,34 @@ namespace MedSlot.Api.Doctors
                 .AsQueryable();
 
             // Filters
+            if (request.Date != null)
+            {
+                query = query.Where(a => a.TimeSlot.StartTime.Date == request.Date);
+            }
             if (request.Status != null)
             {
                 query = query.Where(a => a.AppointmentStatusId == request.Status);
             }
-            if (request.Date != null)
+            else
             {
-                query = query.Where(a => a.TimeSlot.StartTime == request.Date);
+                var doctorRelevantStatuses = new[] { "Confirmed", "Completed", "NoShow", "Cancelled" };
+                query = query.Where(a => doctorRelevantStatuses.Contains(a.AppointmentStatus.StatusName));
             }
 
             var count = await query.CountAsync();
             var items = await query.Skip((request.PageNumber - 1) * request.PageSize).Take(request.PageSize).ToListAsync();
 
             return (items, count);
+        }
+
+        public async Task<List<AppointmentStatusOptionResponse>> GetDoctorAppointmentStatusOptionsAsync()
+        {
+            var doctorRelevantStatuses = new[] { "Confirmed", "Completed", "NoShow", "Cancelled" };
+            
+            return await _context.AppointmentStatuses
+                .Where(s => doctorRelevantStatuses.Contains(s.StatusName))
+                .Select(s => new AppointmentStatusOptionResponse { Id = s.Id, Name = s.StatusName})
+                .ToListAsync();
         }
 
         public async Task SetAvailabilityAsync(Guid doctorId, int consultDurationMinutes, decimal consultationFee, List<DoctorAvailability> newRows)
