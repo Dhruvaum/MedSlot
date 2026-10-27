@@ -138,7 +138,13 @@ namespace MedSlot.Api.Doctors
                 TotalCount = Count
             };
         }
-        
+
+        public async Task<List<AppointmentStatusOptionResponse>> GetDoctorAppointmentStatusOptionsAsync()
+        {
+            return await _doctorRepository.GetDoctorAppointmentStatusOptionsAsync();
+        }
+
+
         public async Task MarkAppointmentOutcomeAsync(MarkAppointmentOutcomeRequest request)
         {
             var doctorId = _currentUser.DoctorId ?? throw new UnauthorizedAccessException();

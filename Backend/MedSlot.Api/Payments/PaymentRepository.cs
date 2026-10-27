@@ -217,7 +217,7 @@ namespace MedSlot.Api.Payments
             return (capturedAttempt.GatewayPaymentId, appointment.Payment.Amount, appointment.TimeSlot.StartTime);
         }
 
-        public async Task RecordRefundAsync(Guid appointmentId, decimal refundAmount, string reason, string gatewayRefundId, string refundReferenceNumber)
+        public async Task CreateRefundRowAndReleaseSlotAsync(Guid appointmentId, decimal refundAmount, string reason, string gatewayRefundId, string refundReferenceNumber)
         {
             var appointment = await _context.Appointments
                 .Include(a => a.TimeSlot)
@@ -253,6 +253,39 @@ namespace MedSlot.Api.Payments
             appointment.Payment.PaymentStatusId = refundInitiatedStatusId;
             appointment.AppointmentStatusId = cancelledAppointmentStatusId;
             appointment.TimeSlot.IsBooked = false;
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<Refund>> GetPendingRefundsAsync()
+        {
+            return await _context.Refunds
+                .Include(r => r.Payment)
+                .ThenInclude(p => p.PaymentStatus)
+                .Where(r => r.Payment.PaymentStatus.StatusName == "RefundInitiated")
+                .ToListAsync();
+        }
+
+        public async Task MarkRefundProcessedAsync(Guid refundId)
+        {
+            var refund = await _context.Refunds.Include(r => r.Payment).FirstOrDefaultAsync(r => r.Id == refundId);
+
+            bool isFullRefund = refund.Amount == refund.Payment.Amount;
+            var refundStatus = isFullRefund ? "Refunded" : "PartiallyRefunded";
+            var paymentStatusId = await _context.PaymentStatuses.Where(ps => ps.StatusName == refundStatus).Select(ps => ps.Id).FirstOrDefaultAsync();
+
+            refund.RefundedAt = DateTime.UtcNow;
+            refund.Payment.PaymentStatusId = paymentStatusId;
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task MarkRefundFailedAsync(Guid refundId)
+        {
+            var refund = await _context.Refunds.Include(r => r.Payment).FirstOrDefaultAsync(r => r.Id == refundId);
+
+            var capturedStatusId = await _context.PaymentStatuses.Where(ps => ps.StatusName == "Captured").Select(ps => ps.Id).FirstOrDefaultAsync();
+            refund.Payment.PaymentStatusId = capturedStatusId;
 
             await _context.SaveChangesAsync();
         }

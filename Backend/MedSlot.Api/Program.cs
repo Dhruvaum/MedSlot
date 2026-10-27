@@ -97,6 +97,12 @@ using (var scope = app.Services.CreateScope())
         job => job.RunAsync(),
         "*/5 * * * *"
     );
+
+    recurringJobManager.AddOrUpdate<SettleRefundsJob>(
+        "settle-refunds",
+        job => job.RunAsync(),
+        "*/15 * * * *"
+    );
 }
 
 // Configure the HTTP request pipeline.

@@ -14,7 +14,10 @@ namespace MedSlot.Api.Payments
         Task<List<PaymentStatusOptionResponse>> GetAllPaymentStatusesAsync();
         Task<ResumeBookingPaymentResponse> GetRazorPayOptionsByAppointmentAsync(Guid appointmentId, string keyId);
         Task<(string gatewayPaymentId, decimal amount, DateTime slotStartTime)> GetCapturedPaymentDetailsAsync(Guid appointmentId);
-        Task RecordRefundAsync(Guid appointmentId, decimal refundAmount, string reason, string gatewayRefundId, string refundReferenceNumber);
+        Task CreateRefundRowAndReleaseSlotAsync(Guid appointmentId, decimal refundAmount, string reason, string gatewayRefundId, string refundReferenceNumber);
+        Task<List<Refund>> GetPendingRefundsAsync();
+        Task MarkRefundProcessedAsync(Guid refundId);
+        Task MarkRefundFailedAsync(Guid refundId);
         Task ReleaseEligibleFundsAsync();
     }
 }

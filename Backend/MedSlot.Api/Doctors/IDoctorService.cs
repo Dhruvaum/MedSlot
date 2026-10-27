@@ -14,6 +14,7 @@ namespace MedSlot.Api.Doctors
         public Task<ViewDoctorProfileResponse> ViewDoctorProfileAsync(Guid Id);
         public Task<ViewDoctorProfileResponse> ViewMyProfileAsync();
         public Task<PagedResponse<DoctorAppointmentSummary>> GetDoctorAppointmentsAsync(GetDoctorAppoinmentsRequest request);
+        public Task<List<AppointmentStatusOptionResponse>> GetDoctorAppointmentStatusOptionsAsync();
         public Task MarkAppointmentOutcomeAsync(MarkAppointmentOutcomeRequest request);
 
     }

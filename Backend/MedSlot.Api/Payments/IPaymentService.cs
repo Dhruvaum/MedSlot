@@ -12,6 +12,7 @@ namespace MedSlot.Api.Payments
         Task<CancelAppointmentResponse> InitiateRefundAndCancelAppointmentAsync(Guid appointmentId, string refundType);
         Task<PagedResponse<TransactionSummaryResponse>> GetPatientTransactionsListingAsync(GetTransactionsListingRequest request);
         Task<List<PaymentStatusOptionResponse>> GetPaymentStatusOptionsAsync();
+        Task SettleRefundsJobAsync();
         Task ReleaseEligibleFundsAsync();
     }
 }

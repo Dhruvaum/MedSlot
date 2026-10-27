@@ -126,7 +126,7 @@ namespace MedSlot.Api.Payments
                 ? "Patient cancelled - full refund (>2hr before appointment)"
                 : "Patient cancelled - late cancellation penalty (<2hr before appointment)";
 
-            await _paymentRepository.RecordRefundAsync(appointmentId, refundAmount, reason, gatewayRefundId, refundReferenceNumber);
+            await _paymentRepository.CreateRefundRowAndReleaseSlotAsync(appointmentId, refundAmount, reason, gatewayRefundId, refundReferenceNumber);
 
             return new CancelAppointmentResponse
             {
@@ -161,6 +161,24 @@ namespace MedSlot.Api.Payments
         public async Task<List<PaymentStatusOptionResponse>> GetPaymentStatusOptionsAsync()
         {
             return await _paymentRepository.GetAllPaymentStatusesAsync();
+        }
+
+        public async Task SettleRefundsJobAsync()
+        {
+            var pendingRefunds = await _paymentRepository.GetPendingRefundsAsync();
+
+            var razorpayKeyId = _configuration["Razorpay:KeyId"];
+            var razorpaySecret = _configuration["Razorpay:KeySecret"];
+            var razorpayClient = new RazorpayClient(razorpayKeyId, razorpaySecret);
+
+            foreach(var refund in pendingRefunds)
+            {
+                var gatewayRefund = razorpayClient.Refund.Fetch(refund.GatewayRefundId);
+                var status = gatewayRefund["status"].ToString();
+
+                if (status == "processed") await _paymentRepository.MarkRefundProcessedAsync(refund.Id);
+                else if(status == "failed") await _paymentRepository.MarkRefundFailedAsync(refund.Id);
+            }
         }
 
         public async Task ReleaseEligibleFundsAsync()
