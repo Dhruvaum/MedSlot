@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { getDoctorAppointments, markAppointmentOutcome } from '../../../features/doctor/doctorService'
-import type { DoctorAppointmentSummary } from '../../../features/doctor/types'
+import { getDoctorAppointments, markAppointmentOutcome, getAppointmentStatusOptions } from '../../../features/doctor/doctorService'
+import type { DoctorAppointmentSummary, AppointmentStatusOptions } from '../../../features/doctor/types'
 
 const PAGE_SIZE = 6
 
@@ -11,13 +11,15 @@ export const useDoctorAppointments = () => {
   const [pageNumber, setPageNumber] = useState(1)
   const [isLoading, setIsLoading] = useState(true)
   const [date, setDate] = useState<string | null>(null)
+  const [statusOptions, setStatusOptions] = useState<AppointmentStatusOptions[]>([])
+  const [status, setStatus] = useState<string | null>(null)
 
   const [updatingId, setUpdatingId] = useState<string | null>(null)
   const [outcomeTarget, setOutcomeTarget] = useState<{ appointmentId: string; outcome: 'Completed' | 'NoShow' } | null>(null)
 
   const loadAppointments = () => {
     setIsLoading(true)
-    getDoctorAppointments({ date, status: null, pageNumber, pageSize: PAGE_SIZE })
+    getDoctorAppointments({ date, status, pageNumber, pageSize: PAGE_SIZE })
       .then((response) => {
         setAppointments(response.items)
         setTotalPages(response.totalPages)
@@ -26,16 +28,26 @@ export const useDoctorAppointments = () => {
   }
 
   useEffect(() => {
+    getAppointmentStatusOptions().then(setStatusOptions)
+  }, [])
+
+  useEffect(() => {
     loadAppointments()
-  }, [date, pageNumber])
+  }, [date, status, pageNumber])
 
   const handleDateChange = (value: string) => {
     setDate(value || null)
     setPageNumber(1)
   }
 
+  const handleStatusChange = (value: string) => {
+    setStatus(value || null)
+    setPageNumber(1)
+  }
+
   const clearFilters = () => {
     setDate(null)
+    setStatus(null)
     setPageNumber(1)
   }
 
@@ -71,6 +83,9 @@ export const useDoctorAppointments = () => {
     isLoading,
     date,
     handleDateChange,
+    statusOptions,
+    status,
+    handleStatusChange,
     clearFilters,
     updatingId,
     outcomeTarget,

@@ -3,7 +3,10 @@ import Page from '../../../components/Page'
 import DoctorCard from './components/DoctorCard'
 import BookingPanel from './components/BookingPanel'
 import DoctorDetailPanel from './components/DoctorDetailPanel'
+import { Slider } from '../../../components/ui/slider'
 import { useFindDoctor } from './useFindDoctor'
+
+const MAX_FEE_CEILING = 2000
 
 const FindDoctorPage = () => {
   const {
@@ -15,6 +18,15 @@ const FindDoctorPage = () => {
     setSearchInput,
     isLoadingList,
     handleSearchSubmit,
+
+    specializations,
+    qualifications,
+    specializationId,
+    qualificationId,
+    maxConsultationFee,
+    handleSpecializationChange,
+    handleQualificationChange,
+    handleMaxFeeChange,
 
     selectedDoctorId,
     doctorDetail,
@@ -81,6 +93,43 @@ const FindDoctorPage = () => {
                 Search
               </button>
             </form>
+
+            <div className="mt-4 flex flex-wrap items-center gap-4 rounded-xl border border-slate-200 bg-white px-4 py-3">
+              <select
+                value={specializationId ?? ''}
+                onChange={(e) => handleSpecializationChange(e.target.value || undefined)}
+                className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 outline-none transition focus:border-brand"
+              >
+                <option value="">All Specializations</option>
+                {specializations.map((s) => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
+
+              <select
+                value={qualificationId ?? ''}
+                onChange={(e) => handleQualificationChange(e.target.value || undefined)}
+                className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 outline-none transition focus:border-brand"
+              >
+                <option value="">All Qualifications</option>
+                {qualifications.map((q) => (
+                  <option key={q.id} value={q.id}>{q.name}</option>
+                ))}
+              </select>
+
+              <div className="flex min-w-55 flex-1 items-center gap-3">
+                <span className="shrink-0 text-xs font-medium text-slate-500">
+                  Max fee: {maxConsultationFee ? `Rs ${maxConsultationFee}` : 'Any'}
+                </span>
+                <Slider
+                  value={[maxConsultationFee ?? MAX_FEE_CEILING]}
+                  max={MAX_FEE_CEILING}
+                  step={50}
+                  onValueChange={([value]) => handleMaxFeeChange(value === MAX_FEE_CEILING ? undefined : value)}
+                  className="flex-1 cursor-pointer"
+                />
+              </div>
+            </div>
 
             <div className="mt-6">
               {isLoadingList ? (

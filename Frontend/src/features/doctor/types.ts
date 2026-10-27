@@ -19,6 +19,7 @@ export interface GetDoctorsListingRequest{
     search?: string,
     specializationId?: string,
     qualificationId?: string,
+    maxConsultationFee?: number,
     pageNumber: number,
     pageSize: number
 }
@@ -72,6 +73,11 @@ export interface DoctorAppointmentSummary{
     endTime: string,
     status: string,
     concern?: string | null
+}
+
+export interface AppointmentStatusOptions{
+    id: string,
+    name: string
 }
 
 export interface MarkAppointmentOutcomeRequest{

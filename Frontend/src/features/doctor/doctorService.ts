@@ -1,6 +1,6 @@
 import { axiosClient } from "../../api/axiosClient";
 import type { PagedResponse } from "../../types/common";
-import type { SpecializationOptions, QualificationOptions, RegisteringCouncilOptions, GetDoctorsListingRequest, DoctorSummaryResponse, ViewDoctorProfileResponse, DoctorAvailability, GetDoctorAppointmentsRequest, DoctorAppointmentSummary, MarkAppointmentOutcomeRequest } from "./types";
+import type { SpecializationOptions, QualificationOptions, RegisteringCouncilOptions, GetDoctorsListingRequest, DoctorSummaryResponse, ViewDoctorProfileResponse, DoctorAvailability, GetDoctorAppointmentsRequest, DoctorAppointmentSummary, MarkAppointmentOutcomeRequest, AppointmentStatusOptions } from "./types";
 
 export const getAllSpecializations = async (): Promise<SpecializationOptions[]> =>{
     const response = await axiosClient.get<SpecializationOptions[]>('/doctors/getSpecializationOptions');
@@ -47,6 +47,11 @@ export const setDoctorAvailability = async (avail: DoctorAvailability) => {
 
 export const getDoctorAppointments = async (req: GetDoctorAppointmentsRequest): Promise<PagedResponse<DoctorAppointmentSummary>> => {
     const response = await axiosClient.post<PagedResponse<DoctorAppointmentSummary>>('/doctors/getDoctorAppointments', req);
+    return response.data;
+}
+
+export const getAppointmentStatusOptions = async (): Promise<AppointmentStatusOptions[]> => {
+    const response = await axiosClient.get<AppointmentStatusOptions[]>('/doctors/getAppointmentStatusOptions');
     return response.data;
 }
 

@@ -1,8 +1,8 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { toast } from 'sonner'
-import { getDoctorsListing } from '../../../features/doctor/doctorService'
+import { getDoctorsListing, getAllSpecializations, getAllQualifications } from '../../../features/doctor/doctorService'
 import { ViewDoctorProfile } from '../../../features/doctor/doctorService'
-import type { DoctorSummaryResponse, ViewDoctorProfileResponse } from '../../../features/doctor/types'
+import type { DoctorSummaryResponse, ViewDoctorProfileResponse, SpecializationOptions, QualificationOptions } from '../../../features/doctor/types'
 import { getAvailableSlots, bookAppointment } from '../../../features/appointment/appointmentService'
 import type { AvailableSlot } from '../../../features/appointment/types'
 import { openRazorpayCheckout } from '@/lib/openRazorpayCheckout'
@@ -21,6 +21,13 @@ export const useFindDoctor = () => {
   const [search, setSearch] = useState('')
   const [isLoadingList, setIsLoadingList] = useState(true)
 
+  // Filters
+  const [specializations, setSpecializations] = useState<SpecializationOptions[]>([])
+  const [qualifications, setQualifications] = useState<QualificationOptions[]>([])
+  const [specializationId, setSpecializationId] = useState<string | undefined>(undefined)
+  const [qualificationId, setQualificationId] = useState<string | undefined>(undefined)
+  const [maxConsultationFee, setMaxConsultationFee] = useState<number | undefined>(undefined)
+
   // Right panel — doctor detail
   const [selectedDoctorId, setSelectedDoctorId] = useState<string | null>(null)
   const [doctorDetail, setDoctorDetail] = useState<ViewDoctorProfileResponse | null>(null)
@@ -36,19 +43,46 @@ export const useFindDoctor = () => {
   const [isBooking, setIsBooking] = useState(false)
 
   useEffect(() => {
+    getAllSpecializations().then(setSpecializations)
+    getAllQualifications().then(setQualifications)
+  }, [])
+
+  useEffect(() => {
     setIsLoadingList(true)
-    getDoctorsListing({ search: search || undefined, pageNumber, pageSize: PAGE_SIZE })
+    getDoctorsListing({
+      search: search || undefined,
+      specializationId,
+      qualificationId,
+      maxConsultationFee,
+      pageNumber,
+      pageSize: PAGE_SIZE,
+    })
       .then((response) => {
         setDoctors(response.items)
         setTotalPages(response.totalPages)
       })
       .finally(() => setIsLoadingList(false))
-  }, [search, pageNumber])
+  }, [search, specializationId, qualificationId, maxConsultationFee, pageNumber])
 
   const handleSearchSubmit = (e: FormEvent) => {
     e.preventDefault()
     setPageNumber(1)
     setSearch(searchInput.trim())
+  }
+
+  const handleSpecializationChange = (specializationId: string | undefined) => {
+    setPageNumber(1)
+    setSpecializationId(specializationId)
+  }
+
+  const handleQualificationChange = (qualificationId: string | undefined) => {
+    setPageNumber(1)
+    setQualificationId(qualificationId)
+  }
+
+  const handleMaxFeeChange = (maxFee: number | undefined) => {
+    setPageNumber(1)
+    setMaxConsultationFee(maxFee)
   }
 
   const loadDoctorDetail = (doctorId: string) => {
@@ -146,6 +180,15 @@ export const useFindDoctor = () => {
     setSearchInput,
     isLoadingList,
     handleSearchSubmit,
+
+    specializations,
+    qualifications,
+    specializationId,
+    qualificationId,
+    maxConsultationFee,
+    handleSpecializationChange,
+    handleQualificationChange,
+    handleMaxFeeChange,
 
     selectedDoctorId,
     doctorDetail,
