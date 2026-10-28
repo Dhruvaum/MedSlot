@@ -1,9 +1,9 @@
-﻿using MedSlot.Api.Admin.Dtos;
+﻿using MedSlot.Api.MedslotSupport.Dtos;
 using MedSlot.Api.Common.Dtos;
 
-namespace MedSlot.Api.Admin
+namespace MedSlot.Api.MedslotSupport
 {
-    public interface IAdminService
+    public interface ISupportService
     {
         Task<List<PendingDoctorVerificationSummary>> GetPendingDoctorVerificationsAsync();
         Task VerifyDoctorAsync(Guid doctorId);

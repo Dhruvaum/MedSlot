@@ -1,4 +1,4 @@
-﻿namespace MedSlot.Api.Admin.Dtos
+﻿namespace MedSlot.Api.MedslotSupport.Dtos
 {
     public class PendingDoctorVerificationSummary
     {

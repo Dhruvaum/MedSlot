@@ -1,8 +1,8 @@
 ﻿using MedSlot.Api.Models;
 
-namespace MedSlot.Api.Admin
+namespace MedSlot.Api.MedslotSupport
 {
-    public interface IAdminRepository
+    public interface ISupportRepository
     {
         Task<List<Doctor>> GetPendingDoctorVerificationsAsync();
         Task VerifyDoctorAsync(Guid doctorId);
