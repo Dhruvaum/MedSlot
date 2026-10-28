@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { getPendingVerifications, verifyDoctor } from '../../features/admin/adminService'
-import type { PendingDoctorVerificationSummary } from '../../features/admin/types'
+import { getPendingVerifications, verifyDoctor } from '../../features/support/supportService'
+import type { PendingDoctorVerificationSummary } from '../../features/support/types'
 
 export const usePendingDoctors = () => {
   const [doctors, setDoctors] = useState<PendingDoctorVerificationSummary[]>([])
