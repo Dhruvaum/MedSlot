@@ -1,5 +1,6 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react'
 import * as yup from 'yup'
+import axios from 'axios'
 import { signInSchema } from './schema'
 import { login } from '../../../../features/auth/AuthService'
 import type { LoginResponse } from '../../../../features/auth/types'
@@ -23,6 +24,7 @@ export const useSignInForm = () => {
     password: '',
   })
   const [errors, setErrors] = useState<FormErrors>({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleChange =
     (field: keyof SignInCredentials) => async (e: ChangeEvent<HTMLInputElement>) => {
@@ -45,7 +47,21 @@ export const useSignInForm = () => {
     try {
       await signInSchema.validate(credentials, { abortEarly: false })
       setErrors({})
+    } catch (err) {
+      if (err instanceof yup.ValidationError) {
+        const newErrors: FormErrors = {}
+        err.inner.forEach((validationError) => {
+          if (validationError.path) {
+            newErrors[validationError.path as keyof SignInCredentials] = validationError.message
+          }
+        })
+        setErrors(newErrors)
+      }
+      return
+    }
 
+    setIsSubmitting(true)
+    try {
       const response:LoginResponse = await login(credentials);
       if(response && response.authToken){
         const {role} = decodeToken(response.authToken);
@@ -74,19 +90,20 @@ export const useSignInForm = () => {
         }
       }
     } catch (err) {
-      if (err instanceof yup.ValidationError) {
-        const newErrors: FormErrors = {}
-        err.inner.forEach((validationError) => {
-          if (validationError.path) {
-            newErrors[validationError.path as keyof SignInCredentials] = validationError.message
-          }
-        })
-        setErrors(newErrors);
-
-        toast.error(`${err}`);
+      if (axios.isAxiosError(err)) {
+        if (err.response) {
+          const message = (err.response.data as { error?: string } | undefined)?.error
+          toast.error(message ?? 'Sign in failed. Please try again.')
+        } else {
+          toast.error('Could not reach the server. Check your connection and try again.')
+        }
+      } else {
+        toast.error('Something went wrong. Please try again.')
       }
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
-  return { credentials, errors, handleChange, handleSubmit }
+  return { credentials, errors, isSubmitting, handleChange, handleSubmit }
 }

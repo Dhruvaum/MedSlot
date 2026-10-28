@@ -12,8 +12,8 @@ interface DoctorCardProps {
 const DoctorCard = ({ doctor, isSelected, isBooking, onViewDetail, onBookNow }: DoctorCardProps) => {
   return (
     <div
-      className={`flex flex-col gap-4 rounded-2xl border bg-white p-6 shadow-sm transition ${
-        isBooking ? 'border-brand shadow-md ring-2 ring-brand/30' : isSelected ? 'border-brand/40' : 'border-slate-100 hover:border-brand hover:shadow-md'
+      className={`flex w-72 flex-col gap-4 rounded-2xl border bg-white p-6 shadow-sm transition ${
+        isBooking ? 'border-brand shadow-md ring-2 ring-brand/30' : isSelected ? 'border-brand/40' : 'border-slate-100 hover:-translate-y-0.5 hover:border-brand hover:shadow-md'
       }`}
     >
       <div className="flex items-center gap-3">

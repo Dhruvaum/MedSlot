@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom'
 import { User, MessageSquare, Clock, CheckCircle2, CalendarClock, XCircle } from 'lucide-react'
 import Page from '../../../components/Page'
 import ConfirmDialog from '../../../components/ConfirmDialog'
+import CollapsibleSection from '../../../components/CollapsibleSection'
+import ListCardSkeleton from '../../../components/ListCardSkeleton'
 import { useMyAppointments } from './useMyAppointments'
 import { parseUtcDate } from '../../../utils/date'
 
@@ -75,16 +77,20 @@ const MyAppointmentsPage = () => {
 
         <div className="mt-8">
           {isLoading ? (
-            <div className="py-20 text-center text-sm text-slate-400">Loading appointments...</div>
+            <div className="flex flex-col gap-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <ListCardSkeleton key={i} />
+              ))}
+            </div>
           ) : appointments.length === 0 ? (
             <div className="flex flex-col items-center gap-3 py-20 text-center">
               <CalendarClock size={32} className="text-slate-300" />
               <p className="text-sm text-slate-400">You haven't booked any appointments yet.</p>
               <Link
-                to="/patient/find-doctor"
+                to="/patient/book-doctor"
                 className="rounded-full bg-brand px-5 py-2 text-sm font-medium text-white transition hover:opacity-90"
               >
-                Find a Doctor
+                Book a Doctor
               </Link>
             </div>
           ) : (
@@ -128,29 +134,31 @@ const MyAppointmentsPage = () => {
                     </div>
                   </div>
 
-                  <div className="mt-5 grid grid-cols-1 gap-5 border-t border-slate-100 pt-4 sm:grid-cols-2">
-                    <div>
-                      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Visit</p>
-                      <div className="flex items-start gap-2 text-sm text-slate-500">
-                        <MessageSquare size={15} className="mt-0.5 shrink-0 text-slate-400" />
-                        <span className="line-clamp-2">{appointment.concern || 'No concern specified'}</span>
-                      </div>
-                    </div>
-
-                    <div>
-                      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Booking</p>
-                      <div className="flex items-center gap-2 text-sm text-slate-600">
-                        <Clock size={15} className="shrink-0 text-slate-400" />
-                        Requested {formatDateTime(appointment.createdAt)}
-                      </div>
-                      {CONFIRMED_STATUSES.has(appointment.status) && (
-                        <div className="mt-2 flex items-center gap-2 text-sm text-slate-500">
-                          <CheckCircle2 size={15} className="shrink-0 text-slate-400" />
-                          Confirmed {formatDateTime(appointment.bookedAt)}
+                  <CollapsibleSection>
+                    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                      <div>
+                        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Visit</p>
+                        <div className="flex items-start gap-2 text-sm text-slate-500">
+                          <MessageSquare size={15} className="mt-0.5 shrink-0 text-slate-400" />
+                          <span className="line-clamp-2">{appointment.concern || 'No concern specified'}</span>
                         </div>
-                      )}
+                      </div>
+
+                      <div>
+                        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Booking</p>
+                        <div className="flex items-center gap-2 text-sm text-slate-600">
+                          <Clock size={15} className="shrink-0 text-slate-400" />
+                          Requested {formatDateTime(appointment.createdAt)}
+                        </div>
+                        {CONFIRMED_STATUSES.has(appointment.status) && (
+                          <div className="mt-2 flex items-center gap-2 text-sm text-slate-500">
+                            <CheckCircle2 size={15} className="shrink-0 text-slate-400" />
+                            Confirmed {formatDateTime(appointment.bookedAt)}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  </CollapsibleSection>
 
                   {(canResumePayment(appointment) || appointment.cancellable) && (
                     <div className="mt-5 flex gap-3 border-t border-slate-100 pt-4">

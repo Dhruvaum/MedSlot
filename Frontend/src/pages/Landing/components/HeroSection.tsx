@@ -20,7 +20,7 @@ const HeroSection = () => {
               to="/signUp"
               className="rounded-full bg-brand px-8 py-3 font-semibold text-white shadow-md transition hover:opacity-90"
             >
-              Find a Doctor
+              Book a Doctor
             </Link>
 
             <a
