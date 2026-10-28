@@ -78,6 +78,12 @@ namespace MedSlot.Api.Auth
                 throw new AuthenticationException("Invalid UserName or Password");
             }
 
+            if (loggingUser.isRegistrationCompleted && userType == "Doctor" && loggingUser.doctorId is null)
+                throw new AuthenticationException("Account Data is inconsistent - contact support.");
+
+            if (loggingUser.isRegistrationCompleted && userType == "Patient" && loggingUser.patientId is null)
+                throw new AuthenticationException("Account Data is inconsistent - contact support.");
+
             Claim? idClaim = null;
 
             // add new claim as per user type
