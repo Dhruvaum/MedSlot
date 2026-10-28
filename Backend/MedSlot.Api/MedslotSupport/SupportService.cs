@@ -1,13 +1,13 @@
-﻿using MedSlot.Api.Admin.Dtos;
+﻿using MedSlot.Api.MedslotSupport.Dtos;
 using MedSlot.Api.Common.Dtos;
 
-namespace MedSlot.Api.Admin
+namespace MedSlot.Api.MedslotSupport
 {
-    public class AdminService: IAdminService
+    public class SupportService: ISupportService
     {
-        private readonly IAdminRepository _repository;
+        private readonly ISupportRepository _repository;
 
-        public AdminService(IAdminRepository repository)
+        public SupportService(ISupportRepository repository)
         {
             _repository = repository;
         }

@@ -2,13 +2,13 @@
 using MedSlot.Api.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace MedSlot.Api.Admin
+namespace MedSlot.Api.MedslotSupport
 {
-    public class AdminRepository: IAdminRepository
+    public class SupportRepository: ISupportRepository
     {
         private readonly MedSlotDbContext _context;
 
-        public AdminRepository(MedSlotDbContext context)
+        public SupportRepository(MedSlotDbContext context)
         {
             _context = context;
         }
