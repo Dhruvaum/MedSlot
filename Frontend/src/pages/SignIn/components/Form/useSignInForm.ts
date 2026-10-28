@@ -55,9 +55,9 @@ export const useSignInForm = () => {
         localStorage.setItem("authToken", response.authToken);
         localStorage.setItem('isRegistrationCompleted', `${response.isRegistrationCompleted}`)
 
-        // Check whether Admin
-        if (role === 'Admin') {
-          navigate('/admin/pending-doctors')
+        // Check whether SupportAgent
+        if (role === 'SupportAgent') {
+          navigate('/support/pending-doctors')
           return
         }
 

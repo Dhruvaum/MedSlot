@@ -2,7 +2,7 @@ import { createBrowserRouter } from "react-router-dom"
 import Layout from "../components/Layout"
 import PatientLayout from "../pages/Patient/PatientLayout"
 import DoctorLayout from "../pages/Doctor/DoctorLayout"
-import AdminLayout from "../pages/Admin/AdminLayout"
+import SupportLayout from "../pages/Support/SupportLayout"
 
 const router = createBrowserRouter([
     {
@@ -104,13 +104,13 @@ const router = createBrowserRouter([
     },
 
     {
-        path: '/admin',
-        element: <AdminLayout />,
+        path: '/support',
+        element: <SupportLayout />,
         children: [
             {
                 path: 'pending-doctors',
                 lazy: async () => ({
-                    Component: (await import('../pages/Admin/PendingDoctorsPage')).default
+                    Component: (await import('../pages/Support/PendingDoctorsPage')).default
                 })
             }
         ]

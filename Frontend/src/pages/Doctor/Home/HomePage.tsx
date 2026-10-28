@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { CalendarClock, User, ShieldCheck, ShieldAlert } from 'lucide-react'
 import Page from '../../../components/Page'
 import { viewMyProfile } from '../../../features/doctor/doctorService'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../../components/ui/tooltip'
 
 const quickLinks = [
   { to: '/doctor/availability', label: 'Availability', icon: CalendarClock },
@@ -25,10 +26,19 @@ const HomePage = () => {
         {isVerified === false && (
           <div className="mt-6 flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
             <ShieldAlert size={18} className="shrink-0" />
-            <span>
-              Your account is <strong>pending verification</strong>. You can configure your profile and availability
-              now, but patients won't be able to find or book you until an admin approves your account.
-            </span>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="cursor-help underline decoration-dotted underline-offset-2">
+                    Your account is <strong>pending verification</strong>.
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  You can configure your profile and availability now, but patients won't be able to find or book
+                  you until MedSlot's Support Staff approves your account.
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         )}
 

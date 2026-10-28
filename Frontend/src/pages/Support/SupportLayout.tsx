@@ -3,7 +3,7 @@ import Header from './components/Header'
 import Sidebar from './components/Sidebar'
 import BackgroundDecoration from '../../components/BackgroundDecoration'
 
-const AdminLayout = () => {
+const SupportLayout = () => {
   return (
     <>
       <div className="flex h-screen overflow-hidden">
@@ -20,4 +20,4 @@ const AdminLayout = () => {
   )
 }
 
-export default AdminLayout
+export default SupportLayout
