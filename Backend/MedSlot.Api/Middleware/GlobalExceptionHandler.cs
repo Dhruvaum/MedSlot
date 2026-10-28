@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
+using System.Security.Authentication;
 
 namespace MedSlot.Api.Middleware
 {
@@ -21,8 +22,10 @@ namespace MedSlot.Api.Middleware
 
             var (statusCode, message) = exception switch
             {
+                AuthenticationException => (StatusCodes.Status401Unauthorized, exception.Message),
                 InvalidOperationException => (StatusCodes.Status409Conflict, exception.Message),
-                _ => (StatusCodes.Status500InternalServerError, "An unexpected erro occured."),
+                UnauthorizedAccessException => (StatusCodes.Status403Forbidden, exception.Message),
+                _ => (StatusCodes.Status500InternalServerError, "An unexpected error occured."),
             };
 
             httpContext.Response.StatusCode = statusCode;
