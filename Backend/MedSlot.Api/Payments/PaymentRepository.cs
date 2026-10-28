@@ -99,8 +99,8 @@ namespace MedSlot.Api.Payments
             // Date Filter
             if(request.Date != null)
             {
-                query = query.Where(pa => pa.AttemptedAt == request.Date);
-                refundQuery = refundQuery.Where(r => r.RefundedAt == request.Date);
+                query = query.Where(pa => pa.AttemptedAt.Date == request.Date);
+                refundQuery = refundQuery.Where(r => r.RefundedAt.HasValue && r.RefundedAt.Value.Date == request.Date);
             }
 
             List<PaymentAttempt> attempts;
