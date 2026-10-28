@@ -28,10 +28,11 @@ export const useFindDoctor = () => {
   const [qualificationId, setQualificationId] = useState<string | undefined>(undefined)
   const [maxConsultationFee, setMaxConsultationFee] = useState<number | undefined>(undefined)
 
-  // Right panel — doctor detail
+  // Doctor detail modal
   const [selectedDoctorId, setSelectedDoctorId] = useState<string | null>(null)
   const [doctorDetail, setDoctorDetail] = useState<ViewDoctorProfileResponse | null>(null)
   const [isLoadingDetail, setIsLoadingDetail] = useState(false)
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
 
   // Left panel — booking
   const [bookingDoctorId, setBookingDoctorId] = useState<string | null>(null)
@@ -94,13 +95,16 @@ export const useFindDoctor = () => {
 
   const handleViewDetail = (doctorId: string) => {
     setSelectedDoctorId(doctorId)
+    setIsDetailModalOpen(true)
     loadDoctorDetail(doctorId)
+  }
+
+  const closeDetailModal = () => {
+    setIsDetailModalOpen(false)
   }
 
   const handleBookNow = (doctorId: string) => {
     setSelectedDoctorId(doctorId)
-    loadDoctorDetail(doctorId)
-
     setBookingDoctorId(doctorId)
     setSelectedDate(undefined)
     setSelectedSlotId(null)
@@ -111,6 +115,8 @@ export const useFindDoctor = () => {
       .then((response) => setAvailableSlots(response))
       .finally(() => setIsLoadingSlots(false))
   }
+
+  const bookingDoctorName = doctors.find((d) => d.id === bookingDoctorId)?.fullName
 
   const availableDates = Array.from(
     new Map(
@@ -193,9 +199,12 @@ export const useFindDoctor = () => {
     selectedDoctorId,
     doctorDetail,
     isLoadingDetail,
+    isDetailModalOpen,
     handleViewDetail,
+    closeDetailModal,
 
     bookingDoctorId,
+    bookingDoctorName,
     availableSlots,
     availableDates,
     slotsForSelectedDate,

@@ -46,9 +46,9 @@ const router = createBrowserRouter([
                 })
             },
             {
-                path: 'find-doctor',
+                path: 'book-doctor',
                 lazy: async () => ({
-                    Component: (await import('../pages/Patient/FindDoctor/FindDoctorPage')).default
+                    Component: (await import('../pages/Patient/BookDoctor/BookDoctorPage')).default
                 })
             },
             {

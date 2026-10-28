@@ -1,6 +1,8 @@
 import { User, MessageSquare, CalendarClock, ChevronLeft, ChevronRight, CheckCircle2, XCircle } from 'lucide-react'
 import Page from '../../../components/Page'
 import ConfirmDialog from '../../../components/ConfirmDialog'
+import CollapsibleSection from '../../../components/CollapsibleSection'
+import ListCardSkeleton from '../../../components/ListCardSkeleton'
 import { useDoctorAppointments } from './useDoctorAppointments'
 import { parseUtcDate } from '../../../utils/date'
 
@@ -95,7 +97,11 @@ const DoctorAppointmentsPage = () => {
 
         <div className="mt-6">
           {isLoading ? (
-            <div className="py-20 text-center text-sm text-slate-400">Loading appointments...</div>
+            <div className="flex flex-col gap-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <ListCardSkeleton key={i} />
+              ))}
+            </div>
           ) : appointments.length === 0 ? (
             <div className="flex flex-col items-center gap-3 py-20 text-center">
               <CalendarClock size={32} className="text-slate-300" />
@@ -141,12 +147,12 @@ const DoctorAppointmentsPage = () => {
                     </div>
                   </div>
 
-                  <div className="mt-5 border-t border-slate-100 pt-4">
+                  <CollapsibleSection>
                     <div className="flex items-start gap-2 text-sm text-slate-500">
                       <MessageSquare size={15} className="mt-0.5 shrink-0 text-slate-400" />
                       <span className="line-clamp-2">{appointment.concern || 'No concern specified'}</span>
                     </div>
-                  </div>
+                  </CollapsibleSection>
 
                   {canMarkOutcome(appointment) && (
                     <div className="mt-5 flex gap-3 border-t border-slate-100 pt-4">

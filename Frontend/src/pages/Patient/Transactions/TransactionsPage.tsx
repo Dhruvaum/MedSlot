@@ -1,5 +1,7 @@
 import { Receipt, CalendarClock, User, Hash, MessageSquare, ChevronLeft, ChevronRight, IndianRupee, Undo2 } from 'lucide-react'
 import Page from '../../../components/Page'
+import CollapsibleSection from '../../../components/CollapsibleSection'
+import ListCardSkeleton from '../../../components/ListCardSkeleton'
 import { useTransactions } from './useTransactions'
 
 const formatDateTime = (iso: string) =>
@@ -96,7 +98,11 @@ const TransactionsPage = () => {
 
         <div className="mt-6">
           {isLoading ? (
-            <div className="py-20 text-center text-sm text-slate-400">Loading transactions...</div>
+            <div className="flex flex-col gap-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <ListCardSkeleton key={i} />
+              ))}
+            </div>
           ) : transactions.length === 0 ? (
             <div className="flex flex-col items-center gap-3 py-20 text-center">
               <Receipt size={32} className="text-slate-300" />
@@ -151,41 +157,43 @@ const TransactionsPage = () => {
                     </div>
                   </div>
 
-                  <div className="mt-5 grid grid-cols-1 gap-5 border-t border-slate-100 pt-4 sm:grid-cols-2">
-                    <div>
-                      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Appointment</p>
-                      <div className="flex items-center gap-2 text-sm text-slate-600">
-                        <CalendarClock size={15} className="shrink-0 text-slate-400" />
-                        {formatDateTime(transaction.slotStartTime)} – {formatTime(transaction.slotEndTime)}
-                      </div>
-                      {transaction.concern && (
-                        <div className="mt-2 flex items-start gap-2 text-sm text-slate-500">
-                          <MessageSquare size={15} className="mt-0.5 shrink-0 text-slate-400" />
-                          <span className="line-clamp-2">{transaction.concern}</span>
+                  <CollapsibleSection>
+                    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                      <div>
+                        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Appointment</p>
+                        <div className="flex items-center gap-2 text-sm text-slate-600">
+                          <CalendarClock size={15} className="shrink-0 text-slate-400" />
+                          {formatDateTime(transaction.slotStartTime)} – {formatTime(transaction.slotEndTime)}
                         </div>
-                      )}
-                    </div>
-
-                    <div>
-                      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
-                        {isRefund ? 'Refund' : 'Payment'}
-                      </p>
-                      <div className="flex items-center gap-2 text-sm text-slate-600">
-                        {isRefund ? (
-                          <Undo2 size={15} className="shrink-0 text-slate-400" />
-                        ) : (
-                          <Receipt size={15} className="shrink-0 text-slate-400" />
+                        {transaction.concern && (
+                          <div className="mt-2 flex items-start gap-2 text-sm text-slate-500">
+                            <MessageSquare size={15} className="mt-0.5 shrink-0 text-slate-400" />
+                            <span className="line-clamp-2">{transaction.concern}</span>
+                          </div>
                         )}
-                        {isRefund ? 'Refunded on' : 'Paid on'} {formatDate(transaction.transactionDate)}
                       </div>
-                      {transaction.referenceNumber && (
-                        <div className="mt-2 flex items-center gap-2 text-sm text-slate-500">
-                          <Hash size={15} className="shrink-0 text-slate-400" />
-                          Ref: {transaction.referenceNumber}
+
+                      <div>
+                        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                          {isRefund ? 'Refund' : 'Payment'}
+                        </p>
+                        <div className="flex items-center gap-2 text-sm text-slate-600">
+                          {isRefund ? (
+                            <Undo2 size={15} className="shrink-0 text-slate-400" />
+                          ) : (
+                            <Receipt size={15} className="shrink-0 text-slate-400" />
+                          )}
+                          {isRefund ? 'Refunded on' : 'Paid on'} {formatDate(transaction.transactionDate)}
                         </div>
-                      )}
+                        {transaction.referenceNumber && (
+                          <div className="mt-2 flex items-center gap-2 text-sm text-slate-500">
+                            <Hash size={15} className="shrink-0 text-slate-400" />
+                            Ref: {transaction.referenceNumber}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  </CollapsibleSection>
                 </div>
                 )
               })}

@@ -6,7 +6,7 @@ const fields: { name: keyof SignInCredentials; label: string; type: string }[] =
 ]
 
 const Form = () => {
-  const { credentials, errors, handleChange, handleSubmit } = useSignInForm()
+  const { credentials, errors, isSubmitting, handleChange, handleSubmit } = useSignInForm()
 
   return (
     <div className="flex min-h-[80vh] flex-col items-center justify-center gap-8 px-4">
@@ -36,9 +36,10 @@ const Form = () => {
 
         <button
           type="submit"
-          className="mt-2 rounded-full bg-brand px-6 py-3 font-semibold text-white shadow-sm transition hover:opacity-90 cursor-pointer"
+          disabled={isSubmitting}
+          className="mt-2 rounded-full bg-brand px-6 py-3 font-semibold text-white shadow-sm transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
         >
-          Sign In
+          {isSubmitting ? 'Signing in...' : 'Sign In'}
         </button>
       </form>
     </div>
