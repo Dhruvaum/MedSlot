@@ -62,6 +62,7 @@ namespace MedSlot.Api.Appointments
                     Id = a.Id,
                     DoctorName = doctor.FullName,
                     SpecializationName = doctor.Specialization.Name,
+                    WorkAddress = doctor.WorkAddress,
                     StartTime = ts.StartTime,
                     EndTime = ts.EndTime,
                     Status = ast.StatusName,
