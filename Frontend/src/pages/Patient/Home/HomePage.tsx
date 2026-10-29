@@ -76,8 +76,9 @@ const HomePage = () => {
           <Skeleton className="mt-6 h-28 w-full rounded-2xl" />
         ) : nextAppointment ? (
           <div className="mt-6 overflow-hidden rounded-2xl bg-linear-to-br from-brand to-teal-800 p-5 text-white shadow-sm">
-            <p className="text-xs font-medium text-white/70">Next Appointment</p>
-            <h2 className="mt-1 text-lg font-semibold">{nextAppointment.doctorName}</h2>
+            <p className="text-xs font-medium tracking text-white/90">Next Appointment</p>
+            <div className="mt-0.5 mb-2 h-px w-27 bg-linear-to-r from-white/70 to-transparent" />
+            <h2 className="text-lg font-semibold">{nextAppointment.doctorName}</h2>
             {nextAppointment.specializationName && (
               <p className="text-sm text-white/80">{nextAppointment.specializationName}</p>
             )}

@@ -2,10 +2,10 @@ import { Link } from 'react-router-dom'
 import logo from '../assets/Logo.png'
 
 const navLinks = [
-  { label: 'How It Works', href: '#how-it-works' },
-  { label: 'Features', href: '#features' },
-  { label: 'For Doctors', href: '/for-doctors' },
-  { label: 'Contact', href: '/contact' },
+  { label: 'How It Works', to: '/#how-it-works' },
+  { label: 'Features', to: '/#features' },
+  { label: 'For Doctors', to: '/for-doctors' },
+  { label: 'Contact', to: '/contact' },
 ]
 
 const Navbar = () => {
@@ -19,13 +19,13 @@ const Navbar = () => {
 
         <nav className="hidden items-center gap-8 md:flex">
           {navLinks.map((link) => (
-            <a
+            <Link
               key={link.label}
-              href={link.href}
+              to={link.to}
               className="text-sm font-medium text-slate-600 transition hover:text-brand"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
