@@ -21,9 +21,9 @@ const Footer = () => {
           <Link to="/for-doctors" className="transition hover:text-brand">
             For Doctors
           </Link>
-          <Link to="/contact" className="transition hover:text-brand">
+          <a href="mailto:contact@dhruvverse.com" className="transition hover:text-brand">
             Contact
-          </Link>
+          </a>
         </nav>
 
         <p className="text-sm text-slate-500">
