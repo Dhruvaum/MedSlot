@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom'
 import Container from '../../../components/Container'
+import Reveal from '../../../components/Reveal'
 
 const HeroSection = () => {
   return (
     <div className="bg-brand/25">
       <Container>
-        <div className="flex flex-col items-center gap-6 py-20 text-center md:py-32">
+        <Reveal className="flex flex-col items-center gap-6 py-20 text-center md:py-32">
           <h1 className="text-4xl font-bold text-slate-800 md:text-6xl">
             Get Your Doctor. <span className="text-brand">Fast.</span>
           </h1>
@@ -30,7 +31,7 @@ const HeroSection = () => {
               How It Works
             </a>
           </div>
-        </div>
+        </Reveal>
       </Container>
     </div>
   )

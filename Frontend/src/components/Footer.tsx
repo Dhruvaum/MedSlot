@@ -12,12 +12,12 @@ const Footer = () => {
         </div>
 
         <nav className="flex flex-wrap justify-center gap-6 text-sm text-slate-600">
-          <a href="#how-it-works" className="transition hover:text-brand">
+          <Link to="/#how-it-works" className="transition hover:text-brand">
             How It Works
-          </a>
-          <a href="#features" className="transition hover:text-brand">
+          </Link>
+          <Link to="/#features" className="transition hover:text-brand">
             Features
-          </a>
+          </Link>
           <Link to="/for-doctors" className="transition hover:text-brand">
             For Doctors
           </Link>

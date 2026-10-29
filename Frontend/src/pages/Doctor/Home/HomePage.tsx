@@ -96,11 +96,12 @@ const HomePage = () => {
           <Skeleton className="mt-6 h-28 w-full rounded-2xl" />
         ) : (
           <div className="mt-6 overflow-hidden rounded-2xl bg-linear-to-br from-brand to-teal-800 p-5 text-white shadow-sm">
-            <div className="flex items-center gap-2 text-xs font-medium text-white/70">
+            <div className="flex items-center gap-2 text-xs font-medium tracking text-white/90">
               <Users size={14} />
               Today
             </div>
-            <h2 className="mt-1 text-lg font-semibold">
+            <div className="mt-0.5 mb-2 h-px w-27 bg-linear-to-r from-white/70 to-transparent" />
+            <h2 className="text-lg font-semibold">
               {todaysAppointments.length === 0
                 ? 'No appointments today'
                 : `${todaysAppointments.length} appointment${todaysAppointments.length === 1 ? '' : 's'} today`}
