@@ -5,8 +5,9 @@ const navLinks = [
   { label: 'How It Works', to: '/#how-it-works' },
   { label: 'Features', to: '/#features' },
   { label: 'For Doctors', to: '/for-doctors' },
-  { label: 'Contact', to: '/contact' },
 ]
+
+const contactEmail = 'contact@dhruvverse.com'
 
 const Navbar = () => {
   return (
@@ -27,6 +28,12 @@ const Navbar = () => {
               {link.label}
             </Link>
           ))}
+          <a
+            href={`mailto:${contactEmail}`}
+            className="text-sm font-medium text-slate-600 transition hover:text-brand"
+          >
+            Contact
+          </a>
         </nav>
 
         <div className="flex items-center gap-3">
