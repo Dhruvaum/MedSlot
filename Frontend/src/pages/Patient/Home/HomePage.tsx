@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Stethoscope, CalendarCheck, Receipt, User, CalendarClock } from 'lucide-react'
+import { Stethoscope, CalendarCheck, Receipt, User, CalendarClock, MapPin } from 'lucide-react'
 import Page from '../../../components/Page'
 import { Skeleton } from '../../../components/ui/skeleton'
 import { viewPatientProfile } from '../../../features/patient/patientService'
@@ -55,30 +55,6 @@ const HomePage = () => {
         </h1>
         <p className="mt-1 text-sm text-slate-500">Here's a quick look at your MedSlot account.</p>
 
-        {isLoadingAppointments ? (
-          <Skeleton className="mt-6 h-28 w-full rounded-2xl" />
-        ) : nextAppointment ? (
-          <div className="mt-6 overflow-hidden rounded-2xl bg-linear-to-br from-brand to-teal-800 p-5 text-white shadow-sm">
-            <p className="text-xs font-medium text-white/70">Next Appointment</p>
-            <h2 className="mt-1 text-lg font-semibold">{nextAppointment.doctorName}</h2>
-            {nextAppointment.specializationName && (
-              <p className="text-sm text-white/80">{nextAppointment.specializationName}</p>
-            )}
-            <div className="mt-3 flex items-center gap-2 text-sm text-white/90">
-              <CalendarClock size={16} className="shrink-0" />
-              {formatDateTime(nextAppointment.startTime)}
-            </div>
-          </div>
-        ) : (
-          <div className="mt-6 flex items-center gap-3 rounded-2xl border border-dashed border-slate-200 bg-white p-5 text-sm text-slate-500">
-            <CalendarClock size={20} className="shrink-0 text-slate-300" />
-            No upcoming appointments —{' '}
-            <Link to="/patient/book-doctor" className="font-medium text-brand hover:underline">
-              book one now
-            </Link>
-            .
-          </div>
-        )}
 
         <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
           {quickLinks.map((link) => {
@@ -95,6 +71,35 @@ const HomePage = () => {
             )
           })}
         </div>
+        
+        {isLoadingAppointments ? (
+          <Skeleton className="mt-6 h-28 w-full rounded-2xl" />
+        ) : nextAppointment ? (
+          <div className="mt-6 overflow-hidden rounded-2xl bg-linear-to-br from-brand to-teal-800 p-5 text-white shadow-sm">
+            <p className="text-xs font-medium text-white/70">Next Appointment</p>
+            <h2 className="mt-1 text-lg font-semibold">{nextAppointment.doctorName}</h2>
+            {nextAppointment.specializationName && (
+              <p className="text-sm text-white/80">{nextAppointment.specializationName}</p>
+            )}
+            <div className="mt-3 flex items-center gap-2 text-sm text-white/90">
+              <CalendarClock size={16} className="shrink-0" />
+              {formatDateTime(nextAppointment.startTime)}
+            </div>
+            <div className="mt-1 flex items-center gap-2 text-sm text-white/90">
+              <MapPin size={16} className="shrink-0" />
+              {nextAppointment.workAddress}
+            </div>
+          </div>
+        ) : (
+          <div className="mt-6 flex items-center gap-3 rounded-2xl border border-dashed border-slate-200 bg-white p-5 text-sm text-slate-500">
+            <CalendarClock size={20} className="shrink-0 text-slate-300" />
+            No upcoming appointments —{' '}
+            <Link to="/patient/book-doctor" className="font-medium text-brand hover:underline">
+              book one now
+            </Link>
+            .
+          </div>
+        )}
       </div>
     </Page>
   )

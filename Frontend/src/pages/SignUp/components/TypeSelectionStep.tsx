@@ -14,7 +14,7 @@ const TypeSelectionStep = ({setType}:
             <button
               type="button"
               onClick={() => setType('Patient')}
-              className="flex flex-col items-center gap-4 rounded-2xl border border-slate-100 bg-white p-8 shadow-sm transition hover:border-brand hover:shadow-md"
+              className="flex flex-col items-center gap-4 rounded-2xl border border-slate-100 bg-white p-8 shadow-sm transition hover:border-brand hover:shadow-lg hover:cursor-pointer"
             >
               <img src={patientIllustration} alt="Patient" className="h-40 w-40" />
               <span className="text-lg font-semibold text-slate-800">I'm a Patient</span>
@@ -23,7 +23,7 @@ const TypeSelectionStep = ({setType}:
             <button
               type="button"
               onClick={() => setType('Doctor')}
-              className="flex flex-col items-center gap-4 rounded-2xl border border-slate-100 bg-white p-8 shadow-sm transition hover:border-brand hover:shadow-md"
+              className="flex flex-col items-center gap-4 rounded-2xl border border-slate-100 bg-white p-8 shadow-sm transition hover:border-brand hover:shadow-lg hover:cursor-pointer"
             >
               <img src={doctorIllustration} alt="Doctor" className="h-40 w-40" />
               <span className="text-lg font-semibold text-slate-800">I'm a Doctor</span>

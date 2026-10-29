@@ -28,6 +28,7 @@ export interface AppointmentSummary{
     id: string,
     doctorName: string,
     specializationName: string | null,
+    workAddress: string,
     startTime: string,
     endTime: string,
     status: string,
