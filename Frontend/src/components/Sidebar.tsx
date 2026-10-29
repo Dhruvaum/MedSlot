@@ -17,11 +17,16 @@ interface SidebarProps {
 
 const Sidebar = ({ navItems, homePath }: SidebarProps) => {
     const [isCollapsed, setIsCollapsed] = useState(false)
+    const [isHovering, setIsHovering] = useState(false)
     const navigate = useNavigate()
+
+    const isExpandedView = !isCollapsed || isHovering
 
     return (
         <aside
-            className={`relative flex flex-col gap-2 border-r border-slate-100 bg-white p-4 transition-all duration-200 ${isCollapsed ? 'w-20' : 'w-64'
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
+            className={`relative flex flex-col gap-2 border-r border-slate-100 bg-white p-4 transition-all duration-300 ease-in-out ${isExpandedView ? 'w-64' : 'w-20'
                 }`}
         >
             <button
@@ -34,11 +39,16 @@ const Sidebar = ({ navItems, homePath }: SidebarProps) => {
             </button>
 
             <div
-                className={`mb-6 flex items-center gap-2 px-2 hover:cursor-pointer ${isCollapsed ? 'justify-center' : ''}`}
+                className={`mb-6 flex items-center gap-2 px-2 hover:cursor-pointer ${isExpandedView ? '' : 'justify-center'}`}
                 onClick={() => navigate(homePath)}
             >
                 <img src={Logo} alt="MedSlot logo" className="h-8 w-8 shrink-0" />
-                {!isCollapsed && <span className="text-lg font-bold text-slate-800">MedSlot</span>}
+                <span
+                    className={`overflow-hidden whitespace-nowrap text-lg font-bold text-slate-800 transition-all duration-300 ${isExpandedView ? 'max-w-40 opacity-100' : 'max-w-0 opacity-0'
+                        }`}
+                >
+                    MedSlot
+                </span>
             </div>
 
             {navItems.map((item) => {
@@ -49,15 +59,20 @@ const Sidebar = ({ navItems, homePath }: SidebarProps) => {
                         key={item.to}
                         to={item.to}
                         end={item.end}
-                        title={isCollapsed ? item.label : undefined}
+                        title={isExpandedView ? undefined : item.label}
                         className={({ isActive }) =>
-                            `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition ${isCollapsed ? 'justify-center' : ''
+                            `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition ${isExpandedView ? '' : 'justify-center'
                             } ${isActive ? 'bg-brand/10 text-brand' : 'text-slate-600 hover:bg-slate-50'
                             }`
                         }
                     >
                         <Icon size={18} className="shrink-0" />
-                        {!isCollapsed && item.label}
+                        <span
+                            className={`overflow-hidden whitespace-nowrap transition-all duration-300 ${isExpandedView ? 'max-w-40 opacity-100' : 'max-w-0 opacity-0'
+                                }`}
+                        >
+                            {item.label}
+                        </span>
                     </NavLink>
                 )
             })}

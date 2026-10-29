@@ -76,6 +76,22 @@ const HomePage = () => {
           </div>
         )}
 
+        <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
+          {quickLinks.map((link) => {
+            const Icon = link.icon
+            return (
+              <Link
+                key={link.to}
+                to={link.to}
+                className="flex flex-col items-center gap-3 rounded-2xl border border-slate-100 bg-white p-6 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-brand hover:shadow-md outline-none"
+              >
+                <Icon size={28} className="text-brand" />
+                <span className="text-sm font-medium text-slate-700">{link.label}</span>
+              </Link>
+            )
+          })}
+        </div>
+
         {isLoadingToday ? (
           <Skeleton className="mt-6 h-28 w-full rounded-2xl" />
         ) : (
@@ -97,22 +113,6 @@ const HomePage = () => {
             )}
           </div>
         )}
-
-        <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
-          {quickLinks.map((link) => {
-            const Icon = link.icon
-            return (
-              <Link
-                key={link.to}
-                to={link.to}
-                className="flex flex-col items-center gap-3 rounded-2xl border border-slate-100 bg-white p-6 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-brand hover:shadow-md outline-none"
-              >
-                <Icon size={28} className="text-brand" />
-                <span className="text-sm font-medium text-slate-700">{link.label}</span>
-              </Link>
-            )
-          })}
-        </div>
       </div>
     </Page>
   )
