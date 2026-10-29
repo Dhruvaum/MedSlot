@@ -10,6 +10,7 @@
         public Guid Id { get; set; }
         public string DoctorName { get; set; }
         public string? SpecializationName { get; set; }
+        public string WorkAddress { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public string Status { get; set; }
