@@ -9,7 +9,7 @@ export interface TokenPayload{
 export const decodeToken = (token: string) => jwtDecode<TokenPayload>(token);
 
 export const isTokenExpired = (token: string) => {
-    const {exp} = jwtDecode(token);
+    const {exp} = jwtDecode<TokenPayload>(token);
 
     return Date.now() >= exp*1000;
 }

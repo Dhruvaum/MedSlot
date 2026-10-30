@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
 import type { ViewDoctorProfileResponse } from '../../../features/doctor/types';
 import { viewMyProfile } from '../../../features/doctor/doctorService';
 import Page from '../../../components/Page';

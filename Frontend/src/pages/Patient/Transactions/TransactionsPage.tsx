@@ -25,6 +25,7 @@ const statusStyles: Record<string, string> = {
   Failed: 'bg-orange-50 text-orange-600',
   Refunded: 'bg-slate-100 text-slate-600',
   PartiallyRefunded: 'bg-amber-50 text-amber-600',
+  RefundInitiated: 'bg-violet-50 text-violet-600',
 }
 
 const statusBarStyles: Record<string, string> = {
@@ -33,6 +34,7 @@ const statusBarStyles: Record<string, string> = {
   Failed: 'bg-orange-400',
   Refunded: 'bg-slate-300',
   PartiallyRefunded: 'bg-amber-400',
+  RefundInitiated: 'bg-violet-400',
 }
 
 const TransactionsPage = () => {
@@ -113,7 +115,11 @@ const TransactionsPage = () => {
           ) : (
             <div className="flex flex-col gap-4">
               {transactions.map((transaction) => {
-                const isRefund = transaction.transactionStatus === 'Refunded' || transaction.transactionStatus === 'PartiallyRefunded'
+                const isRefundPending = transaction.transactionStatus === 'RefundInitiated'
+                const isRefund =
+                  isRefundPending ||
+                  transaction.transactionStatus === 'Refunded' ||
+                  transaction.transactionStatus === 'PartiallyRefunded'
 
                 return (
                 <div
@@ -153,7 +159,9 @@ const TransactionsPage = () => {
                         <IndianRupee size={17} className={isRefund ? 'text-emerald-500' : 'text-slate-500'} />
                         {transaction.transactionAmount}
                       </div>
-                      <div className="text-xs text-slate-400">{isRefund ? 'Refunded' : 'Amount'}</div>
+                      <div className="text-xs text-slate-400">
+                        {isRefundPending ? 'Refund pending' : isRefund ? 'Refunded' : 'Amount'}
+                      </div>
                     </div>
                   </div>
 
@@ -183,7 +191,8 @@ const TransactionsPage = () => {
                           ) : (
                             <Receipt size={15} className="shrink-0 text-slate-400" />
                           )}
-                          {isRefund ? 'Refunded on' : 'Paid on'} {formatDate(transaction.transactionDate)}
+                          {isRefundPending ? 'Refund initiated on' : isRefund ? 'Refunded on' : 'Paid on'}{' '}
+                          {formatDate(transaction.transactionDate)}
                         </div>
                         {transaction.referenceNumber && (
                           <div className="mt-2 flex items-center gap-2 text-sm text-slate-500">
