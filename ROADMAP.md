@@ -12,7 +12,7 @@ This roadmap tracks MedSlot's version-scoped progress. It's a living document, u
 Single clinic/tenant, search-and-book by specialty, concurrency-safe booking, real sandbox payments, deployed live.
 
 **Core booking & payments**
-- ✅ Backend project scaffolded (ASP.NET Core Web API, .NET 8)
+- ✅ Backend project scaffolded (ASP.NET Core Web API, .NET 8, since upgraded to .NET 10 LTS)
 - ✅ Frontend project scaffolded (React + Vite + TypeScript + Tailwind CSS)
 - ✅ Database schema & EF Core setup (patient, doctor, appointment, payment all in place)
 - ✅ JWT authentication + role-based authorization (Patient / Doctor / SupportAgent)
@@ -35,7 +35,8 @@ Single clinic/tenant, search-and-book by specialty, concurrency-safe booking, re
 - 📅 Redis caching for slot-availability reads
 - 📅 Serilog structured logging
 - 📅 xUnit + Moq test coverage — only one test exists today (the concurrency stress test); broader coverage still needed
-- 📅 Deployed to Azure App Service + Azure SQL, with CI/CD — not started; no deployment files or CI workflow exist yet
+- ✅ Deployed live — API on Azure App Service, database on Azure SQL, frontend on Vercel
+- 📅 CI/CD — frontend auto-deploys from `main` via Vercel; no GitHub Actions workflow for the API yet (published manually)
 - 📅 Automated appointment reminder job (notify patient before their appointment)
 - 📅 Visible countdown timer during checkout (the hold-expiry mechanism itself already exists server-side and client-side; only the on-screen countdown is missing)
 - 📅 Doctor earnings/settlements page (lightweight v1 version showing eligible/released funds; full real payout view depends on v2's Razorpay Route work)

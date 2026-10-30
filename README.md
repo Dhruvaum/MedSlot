@@ -2,6 +2,8 @@
 
 Convinient And Safe doctor appointment booking platform.
 
+**Live**: [medslot-lemon.vercel.app](https://medslot-lemon.vercel.app)
+
 ## Goal
 
 To provide the fastest, most convenient way for a patient to find and book a doctor's appointment.
@@ -23,13 +25,13 @@ To provide the fastest, most convenient way for a patient to find and book a doc
 
 ## Tech Stack
 
-**Backend**: ASP.NET Core Web API (.NET 8 LTS), EF Core, SQL Server, Redis, Hangfire, JWT auth, Serilog, xUnit + Moq, Swagger/OpenAPI
+**Backend**: ASP.NET Core Web API (.NET 10 LTS), EF Core, SQL Server, Hangfire, JWT auth, Razorpay, xUnit, Swagger/OpenAPI
 
 **Frontend**: React + TypeScript + Vite, Tailwind CSS, shadcn/ui + Radix, React Router, Axios, dayjs, Yup
 
 **Database**: SQL Server (local for development, Azure SQL Database for production)
 
-**Deployment**: Azure App Service + Azure SQL, with CI/CD
+**Deployment**: API on Azure App Service, database on Azure SQL Database, frontend on Vercel
 
 ## Architecture
 
@@ -64,6 +66,8 @@ MedSlot follows real gated onboarding — a doctor who signs up from scratch won
 | Patient | `rohan.mehta` | `Demo@1234` |
 | Doctor (already verified) | `dr.ananya.sharma` | `Demo@1234` |
 | Support | `medslotsupport` | `admin@123` |
+
+The server sleeps when idle, so the first sign-in after a quiet spell can take up to a minute while it wakes up. Everything is fast after that.
 
 Want to see the real onboarding flow instead? Sign up as a new doctor from scratch — your dashboard is usable immediately, but you won't appear in patient search until approved. As a solo project, approval isn't instant or guaranteed within any particular window.
 
