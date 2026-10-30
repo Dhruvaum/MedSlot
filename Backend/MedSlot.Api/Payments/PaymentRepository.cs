@@ -100,7 +100,7 @@ namespace MedSlot.Api.Payments
             if(request.Date != null)
             {
                 query = query.Where(pa => pa.AttemptedAt.Date == request.Date);
-                refundQuery = refundQuery.Where(r => r.RefundedAt.HasValue && r.RefundedAt.Value.Date == request.Date);
+                refundQuery = refundQuery.Where(r => (r.RefundedAt ?? r.CreatedAt).Date == request.Date);
             }
 
             List<PaymentAttempt> attempts;
@@ -114,13 +114,13 @@ namespace MedSlot.Api.Payments
                     .Select(ps => ps.StatusName)
                     .FirstOrDefaultAsync();
 
-                bool isRefundStatusFilter = filterStatusName == "Refunded" || filterStatusName == "PartiallyRefunded";
+                bool isRefundStatusFilter = filterStatusName is "Refunded" or "PartiallyRefunded" or "RefundInitiated";
 
                 if (isRefundStatusFilter)
                 {
                     attempts = new List<PaymentAttempt>();
                     var allRefunds = await refundQuery.ToListAsync();
-                    refunds = allRefunds.Where(r => (filterStatusName == "Refunded") == (r.Amount == r.Payment.Amount)).ToList();
+                    refunds = allRefunds.Where(r => GetRefundStatus(r) == filterStatusName).ToList();
                 }
                 else
                 {
@@ -160,7 +160,7 @@ namespace MedSlot.Api.Payments
                 Id = r.Id,
                 TransactionAmount = r.Amount,
                 TransactionDate = r.RefundedAt ?? r.CreatedAt,
-                TransactionStatus = r.Amount == r.Payment.Amount ? "Refunded" : "PartiallyRefunded",
+                TransactionStatus = GetRefundStatus(r),
                 ReferenceNumber = r.ReferenceNumber,
                 AppointmentDate = r.Payment.Appointment.TimeSlot.StartTime,
                 SlotStartTime = r.Payment.Appointment.TimeSlot.StartTime,
@@ -173,6 +173,10 @@ namespace MedSlot.Api.Payments
                 .OrderByDescending(t => t.TransactionDate)
                 .ToList();
         }
+
+        private static string GetRefundStatus(Refund r) =>
+            r.RefundedAt == null ? "RefundInitiated"
+            : r.Amount == r.Payment.Amount ? "Refunded" : "PartiallyRefunded";
 
         public async Task<List<PaymentStatusOptionResponse>> GetAllPaymentStatusesAsync()
         {
