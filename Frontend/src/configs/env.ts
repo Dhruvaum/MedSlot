@@ -1,3 +1,3 @@
 export class Environment {
-    public static readonly BASE_URL = 'https://localhost:/api'
+    public static readonly BASE_URL = import.meta.env.VITE_API_BASE_URL
 }

@@ -2,7 +2,7 @@ import { Bell, UserCircle } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { clearAuthSession } from "../../../features/auth/AuthService"
 import { useEffect, useRef, useState } from "react"
-import { toast, Toaster } from "sonner"
+import { toast } from "sonner"
 
 const Header = () => {
 

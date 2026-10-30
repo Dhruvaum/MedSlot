@@ -69,6 +69,10 @@ export const useAvailability = () => {
       toast.error('Enter a consultation duration before saving')
       return
     }
+    if (!consultationFee || consultationFee <= 0) {
+      toast.error('Enter a consultation fee before saving')
+      return
+    }
 
     setIsSaving(true)
     try {
