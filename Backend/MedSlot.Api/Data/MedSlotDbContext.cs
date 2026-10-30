@@ -47,8 +47,11 @@ public partial class MedSlotDbContext : DbContext
     public virtual DbSet<UserType> UserTypes { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer("Server=LAPTOP-4ORBUCUD\\SQLEXPRESS;Database=MedSlot;Trusted_Connection=True;TrustServerCertificate=True;");
-
+    {
+        if(!optionsBuilder.IsConfigured)
+            optionsBuilder.UseSqlServer("Server=LAPTOP-4ORBUCUD\\SQLEXPRESS;Database=MedSlot;Trusted_Connection=True;TrustServerCertificate=True;");
+    }
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Appointment>(entity =>
